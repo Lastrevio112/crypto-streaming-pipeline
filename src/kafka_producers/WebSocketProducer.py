@@ -37,3 +37,8 @@ class WebSocketProducer(ABC):
     
     def run(self):
         self.ws.run_forever(ping_interval=20, ping_timeout=10)
+
+    # This method is needed in data source 2 to close the connection after 23h and restart it
+    def stop(self):     
+        if self.ws:
+            self.ws.close()
