@@ -2,6 +2,7 @@
 
 import requests
 import json
+import os
 
 response = requests.get("https://api.binance.com/api/v3/ticker/24hr")
 tickers = response.json()
@@ -20,4 +21,4 @@ top_50 = sorted(
 
 #symbols = [t["symbol"].lower() + '@trade' for t in top_50]
 symbols = [t["symbol"] for t in top_50 if t["symbol"] != "USDCUSDT"] 
-print(symbols)
+print(os.getenv("NUM_PARTITIONS"))
