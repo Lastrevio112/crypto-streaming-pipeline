@@ -12,7 +12,8 @@ services:
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     shm_size: '2gb'
     env_file:
-      - ../.env  # in case we will ever need this in our exercises
+      - ../.env 
+    restart: unless-stopped
     depends_on:
       kafka:
         condition: service_healthy
@@ -43,6 +44,7 @@ services:
       retries: 10
     volumes:
     - kafka-data:/var/kafka
+    restart: unless-stopped
   
   schema-registry:
     image: confluentinc/cp-schema-registry:7.6.0
@@ -61,6 +63,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 10
+    restart: unless-stopped
   
   clickhouse:
     image: clickhouse/clickhouse-server:25.10-distroless
@@ -82,6 +85,7 @@ services:
       - CLICKHOUSE_USER=default
       - CLICKHOUSE_PASSWORD=password
       - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+    restart: unless-stopped
 
   jobmanager:
     platform: linux/arm64
@@ -100,6 +104,7 @@ services:
       - flink-checkpoints:/tmp/flink-checkpoints
       - ./flink-libs:/opt/flink/lib/extra   # mount a local folder with JARs
       - ..:/workspace
+    restart: unless-stopped
 
   taskmanager:
     platform: linux/arm64
@@ -119,6 +124,7 @@ services:
       - flink-checkpoints:/tmp/flink-checkpoints
       - ./flink-libs:/opt/flink/lib/extra
       - ..:/workspace
+    restart: unless-stopped
   
 volumes:
   kafka-data:
