@@ -1,0 +1,42 @@
+{
+  "name": "Crypto-Streaming-Pipeline",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {} // Git CLI hosted on host's container, not on Docker
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.pylance",
+        "eamodio.gitlens",
+        "GitHub.vscode-pull-request-github",
+        "ms-azuretools.vscode-docker",
+        "esbenp.prettier-vscode",
+        "redhat.vscode-yaml"
+      ],
+      "settings": {
+        // Python settings — point to the container's Python
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.terminal.activateEnvironment": false,
+
+        // Terminal should open at workspace root
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.cwd": "/workspace"
+      }
+    }
+  },
+
+  // Run after the container starts
+  "postStartCommand": "echo 'Container ready!'",
+  "forwardPorts": [8123, 9092, 8081, 8082, 8085],
+  "portsAttributes": {
+    "8123": { "label": "ClickHouse HTTP" },
+    "9092": { "label": "Kafka" },
+    "8085": { "label": "Schema Registry" },
+    "8082": { "label": "Flink UI" }
+  }
+}

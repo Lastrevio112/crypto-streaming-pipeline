@@ -1,0 +1,129 @@
+services:
+  app:
+    platform: linux/arm64
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ..:/workspace
+    command: sleep infinity
+    environment:
+      - PYTHONPATH=/workspace
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    shm_size: '2gb'
+    env_file:
+      - ../.env  # in case we will ever need this in our exercises
+    depends_on:
+      kafka:
+        condition: service_healthy
+      schema-registry:
+        condition: service_healthy
+      clickhouse:
+        condition: service_started
+      jobmanager:          
+        condition: service_started
+    
+  kafka:
+    image: apache/kafka:4.3.0-rc0
+    platform: linux/arm64
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+    healthcheck:
+      test: ["CMD", "/opt/kafka/bin/kafka-topics.sh", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    volumes:
+    - kafka-data:/var/kafka
+  
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.6.0
+    platform: linux/arm64
+    ports: 
+     - "8085:8081"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:9092
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/subjects"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+  
+  clickhouse:
+    image: clickhouse/clickhouse-server:25.10-distroless
+    platform: linux/arm64
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+      - clickhouse-logs:/var/log/clickhouse-server/
+      - clickhouse-config:/etc/clickhouse-server/config.d/*.xml
+      - clickhouse-users:/etc/clickhouse-server/users.d/*.xml
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    environment:
+      - CLICKHOUSE_DB=default
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=password
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+
+  jobmanager:
+    platform: linux/arm64
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile.flink
+    entrypoint: /opt/flink/bin/jobmanager.sh
+    command: start-foreground
+    ports:
+      - "8081:8081"   # Flink Web UI
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+    volumes:
+      - flink-checkpoints:/tmp/flink-checkpoints
+      - ./flink-libs:/opt/flink/lib/extra   # mount a local folder with JARs
+      - ..:/workspace
+
+  taskmanager:
+    platform: linux/arm64
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile.flink
+    entrypoint: /opt/flink/bin/taskmanager.sh
+    command: start-foreground
+    depends_on:
+      - jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 4
+    volumes:
+      - flink-checkpoints:/tmp/flink-checkpoints
+      - ./flink-libs:/opt/flink/lib/extra
+      - ..:/workspace
+  
+volumes:
+  kafka-data:
+  clickhouse-data:
+  clickhouse-logs:
+  clickhouse-config:
+  clickhouse-users:
+  flink-checkpoints:
