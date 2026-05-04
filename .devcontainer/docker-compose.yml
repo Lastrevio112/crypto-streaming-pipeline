@@ -38,13 +38,14 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
       KAFKA_LOG_RETENTION_HOURS: 96 # Retain logs for 4 days
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
     healthcheck:
       test: ["CMD", "/opt/kafka/bin/kafka-topics.sh", "--bootstrap-server", "localhost:9092", "--list"]
       interval: 10s
       timeout: 10s
       retries: 10
     volumes:
-    - kafka-data:/var/kafka
+    - kafka-data:/var/lib/kafka
     restart: unless-stopped
   
   schema-registry:
@@ -75,8 +76,8 @@ services:
     volumes:
       - clickhouse-data:/var/lib/clickhouse
       - clickhouse-logs:/var/log/clickhouse-server/
-      - clickhouse-config:/etc/clickhouse-server/config.d/*.xml
-      - clickhouse-users:/etc/clickhouse-server/users.d/*.xml
+      - clickhouse-config:/etc/clickhouse-server/config.d
+      - clickhouse-users:/etc/clickhouse-server/users.d
     ulimits:
       nofile:
         soft: 262144
