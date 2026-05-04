@@ -1,9 +1,12 @@
-import os
+import os, sys
 import json
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroSerializer
 from confluent_kafka.serialization import SerializationContext, MessageField
 
+sys.path.append('/workspace/src/proto')
+
+from src.proto import PushDataV3ApiWrapper_pb2
 # Imports created by me
 from src.kafka_producers import WebSocketProducer, custom_partitioner
 
@@ -38,6 +41,32 @@ class MexcProducer_DS2(WebSocketProducer):
         
         symbol = data.get("symbol")  # we get the cryptocurrency here, which is also the partition key
         partition = custom_partitioner(symbol, num_partitions=int(os.getenv("NUM_PARTITIONS")))
+
+        # Binary = protobuf trade data
+        wrapper = PushDataV3ApiWrapper_pb2.PushDataV3ApiWrapper()
+        wrapper.ParseFromString(message)
+
+        symbol = wrapper.symbol
+        partition = custom_partitioner(symbol, num_partitions=int(os.getenv("NUM_PARTITIONS")))
+
+        # Converting to plain dict to match my Avro schema
+        data = {
+            "channel": wrapper.channel,
+            "symbol": symbol,
+            "sendtime": wrapper.sendTime,
+            "publicdeals": {
+                "eventtype": wrapper.publicAggreDeals.eventType,
+                "dealsList": [
+                    {
+                        "price": deal.price,
+                        "quantity": deal.quantity,
+                        "tradetype": deal.tradeType,
+                        "time": deal.time,
+                    }
+                    for deal in wrapper.publicAggreDeals.deals
+                ]
+            }
+        }
 
         serialized = self.avro_serializer(
             data,

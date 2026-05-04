@@ -4,3 +4,4 @@ websocket-client
 clickhouse-connect
 apache-flink==2.0.0
 websockets
+protobuf
