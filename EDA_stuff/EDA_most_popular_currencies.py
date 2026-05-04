@@ -19,5 +19,5 @@ top_50 = sorted(
 )[:51]
 
 #symbols = [t["symbol"].lower() + '@trade' for t in top_50]
-symbols = [t["symbol"] for t in top_50 if t["symbol"] != "USDTUSDT"] 
+symbols = [t["symbol"] for t in top_50 if t["symbol"] != "USDCUSDT"] 
 print(symbols)

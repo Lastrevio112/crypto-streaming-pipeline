@@ -1,7 +1,7 @@
 import websocket
-import json 
 from confluent_kafka import Producer
 from abc import ABC, abstractmethod
+import sys
 
 class WebSocketProducer(ABC):
     def __init__(self, url: str, streams: list, producer: Producer, topic: str):

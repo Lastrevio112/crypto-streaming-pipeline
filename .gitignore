@@ -2,3 +2,4 @@
 .devcontainer/flink-libs
 .env
 .vscode/
+__pycache__/
