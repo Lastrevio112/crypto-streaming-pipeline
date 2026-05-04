@@ -1,1 +1,2 @@
 from .WebSocketProducer import WebSocketProducer
+from .custom_partitioner import custom_partitioner
