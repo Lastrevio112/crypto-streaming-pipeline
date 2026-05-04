@@ -30,21 +30,23 @@ class MexcProducer_DS2(WebSocketProducer):
         self.no_of_ms = no_of_ms # MEXC makes us choose between 10ms and 100ms latency, we choose 100ms by default
     
     def on_message(self, ws, message):
-        data = json.loads(message)
         # subscription response looks like {"id": 0, "code": 0, "msg": "spot@public.aggre.deals.v3.api.pb@100ms@BTCUSDT"}
-        if "code" in data:
-            if data["code"] == 0:
-                print(f"Subscription confirmed (id={data['id']})")
-            else:
-                print(f"Subscription failed: {data}")
+        if isinstance(message, str):
+            data = json.loads(message)
+            if "code" in data:
+                if data["code"] == 0:
+                    print(f"Subscription confirmed (id={data['id']})")
+                else:
+                    print(f"Subscription failed: {data}")
             return
-        
-        symbol = data.get("symbol")  # we get the cryptocurrency here, which is also the partition key
-        partition = custom_partitioner(symbol, num_partitions=int(os.getenv("NUM_PARTITIONS")))
 
         # Binary = protobuf trade data
         wrapper = PushDataV3ApiWrapper_pb2.PushDataV3ApiWrapper()
-        wrapper.ParseFromString(message)
+        try:
+            wrapper.ParseFromString(message)
+        except Exception as e:
+            print(f"Protobuf parse error: {e}")
+            return
 
         symbol = wrapper.symbol
         partition = custom_partitioner(symbol, num_partitions=int(os.getenv("NUM_PARTITIONS")))
@@ -87,7 +89,7 @@ class MexcProducer_DS2(WebSocketProducer):
 
         #MEXC API requires a list of parameters where each crypto coin is prefixed with that string
         for stream in self.streams:
-            params.append(f"spot@public.aggre.deals.v3.pb.api@{self.no_of_ms}ms@{stream}")
+            params.append(f"spot@public.aggre.deals.v3.api.pb@{self.no_of_ms}ms@{stream}")
 
         subscribe_message = {
             "method": "SUBSCRIPTION",

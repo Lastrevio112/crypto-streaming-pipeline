@@ -24,8 +24,8 @@ try:
             print(f"Error: {msg.error()}")
             continue
         data = avro_deserializer(msg.value(), SerializationContext(str(os.environ.get("TOPIC_DS_2")), MessageField.VALUE))
-        for deal in data["dealsList"]: # (1: Buy, 2: Sell)
-            if deal["tradetype"] == 1:
+        for deal in data['publicdeals']["dealsList"]: # (1: Buy, 2: Sell)
+            if deal["tradetype"] == '1' or deal["tradetype"] == 1:
                 print(f"{data['symbol']} was bought at price {deal['price']} with quantity {deal['quantity']}")
             else:
                 print(f"{data['symbol']} was sold at price {deal['price']} with quantity {deal['quantity']}")
