@@ -5,16 +5,6 @@ import os
 # Setup
 env = StreamExecutionEnvironment.get_execution_environment()
 
-FLINK_LIB = "/opt/flink/lib"
-jars = [
-    "flink-sql-avro-confluent-registry-2.0.0.jar",
-    "flink-sql-connector-kafka-3.3.0-1.20.jar",
-]
-jar_urls = [
-    f"file://{FLINK_LIB}/{jar}" for jar in jars
-]
-env.add_jars(*jar_urls)
-
 # Table environment
 settings = EnvironmentSettings.new_instance().in_streaming_mode().build()
 t_env = StreamTableEnvironment.create(env, settings)
@@ -35,7 +25,7 @@ def execute_sql_file(t_env, file_path, stmt_set=None):
                     stmt_set.add_insert_sql(statement)
                 else:               #Otherwise, we simply execute DDL statements
                     print("=== EXECUTING ===")
-                    print(statement)
+                    print(statement + '\n')
                     t_env.execute_sql(statement)
 
 stmt_set = t_env.create_statement_set()
