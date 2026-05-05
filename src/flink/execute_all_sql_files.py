@@ -5,9 +5,20 @@ import os
 # Setup
 env = StreamExecutionEnvironment.get_execution_environment()
 
+FLINK_LIB = "/opt/flink/lib"
+jars = [
+    "flink-sql-avro-confluent-registry-2.0.0.jar",
+    "flink-sql-connector-kafka-3.3.0-1.20.jar",
+]
+jar_urls = [
+    f"file://{FLINK_LIB}/{jar}" for jar in jars
+]
+env.add_jars(*jar_urls)
+
 # Table environment
 settings = EnvironmentSettings.new_instance().in_streaming_mode().build()
 t_env = StreamTableEnvironment.create(env, settings)
+
 
 # I wrote this function so I can add the file name without the full absolute path when calling the other function
 def computeAbsPath(path = str) -> str:

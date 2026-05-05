@@ -2,6 +2,8 @@ FROM --platform=linux/arm64 flink:2.0.0-scala_2.12-java11
 
 USER root
 
+ENV FLINK_VERSION=2.0.0
+
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-venv \
@@ -24,11 +26,21 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 # Add Avro + Confluent registry JARs
-RUN curl -L https://repo1.maven.org/maven2/org/apache/flink/flink-avro/${FLINK_VERSION}/flink-avro-${FLINK_VERSION}.jar \
-    -o /opt/flink/lib/flink-avro-${FLINK_VERSION}.jar
-
 RUN curl -L https://repo1.maven.org/maven2/org/apache/flink/flink-sql-avro-confluent-registry/${FLINK_VERSION}/flink-sql-avro-confluent-registry-${FLINK_VERSION}.jar \
         -o /opt/flink/lib/flink-sql-avro-confluent-registry-${FLINK_VERSION}.jar
+
+# Add Kafka SQL Connector
+RUN curl -L https://repo1.maven.org/maven2/org/apache/flink/flink-sql-connector-kafka/3.3.0-1.20/flink-sql-connector-kafka-3.3.0-1.20.jar \
+        -o /opt/flink/lib/flink-sql-connector-kafka-3.3.0-1.20.jar
+
+# They need to be added to the PyFlink location as well, because PyFlink spins up its own JVM bullshit:
+RUN PYFLINK_LIB=$(python3 -c "import pyflink; import os; print(os.path.join(os.path.dirname(pyflink.__file__), 'lib'))") && \
+    echo "PyFlink lib dir: $PYFLINK_LIB" && \
+    curl -L https://repo1.maven.org/maven2/org/apache/flink/flink-sql-avro-confluent-registry/${FLINK_VERSION}/flink-sql-avro-confluent-registry-${FLINK_VERSION}.jar \
+        -o ${PYFLINK_LIB}/flink-sql-avro-confluent-registry-${FLINK_VERSION}.jar && \
+    curl -L https://repo1.maven.org/maven2/org/apache/flink/flink-sql-connector-kafka/3.3.0-1.20/flink-sql-connector-kafka-3.3.0-1.20.jar \
+        -o ${PYFLINK_LIB}/flink-sql-connector-kafka-3.3.0-1.20.jar && \
+    chmod 644 ${PYFLINK_LIB}/*.jar
 
 RUN chmod -R 777 /opt/flink/lib/*.jar
 
