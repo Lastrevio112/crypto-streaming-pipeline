@@ -18,6 +18,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN curl -L https://archive.apache.org/dist/flink/flink-${FLINK_VERSION}/flink-${FLINK_VERSION}-bin-scala_${SCALA_VERSION}.tgz | tar -xzC /opt \
     && mv /opt/flink-${FLINK_VERSION} /opt/flink
 
+# Add Avro + Confluent registry JARs
+RUN curl -L https://repo1.maven.org/maven2/org/apache/flink/flink-sql-avro/${FLINK_VERSION}/flink-sql-avro-${FLINK_VERSION}.jar \
+        -o /opt/flink/lib/flink-sql-avro-${FLINK_VERSION}.jar \
+    && curl -L https://repo1.maven.org/maven2/org/apache/flink/flink-sql-avro-confluent-registry/${FLINK_VERSION}/flink-sql-avro-confluent-registry-${FLINK_VERSION}.jar \
+        -o /opt/flink/lib/flink-sql-avro-confluent-registry-${FLINK_VERSION}.jar
+
 WORKDIR /opt/flink
 ENV PATH=$PATH:/opt/flink/bin
 
