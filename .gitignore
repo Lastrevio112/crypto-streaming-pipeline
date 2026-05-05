@@ -1,6 +1,6 @@
 .devcontainer/devcontainer-lock.json
 .devcontainer/flink-libs
-.env
 .vscode/
 __pycache__/
 websocket-proto/
+*/test_consumer*.py
