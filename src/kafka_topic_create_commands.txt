@@ -1,0 +1,11 @@
+//I created these by hand in the terminal but I'm adding the commands here for logging purposes:
+
+bin/kafka-topics.sh --create --topic binance_ds1_trades --bootstrap-server localhost:9092 --partitions 10 --replication-factor 1
+
+bin/kafka-topics.sh --create --topic mexc_ds2_trades --bootstrap-server localhost:9092 --partitions 10 --replication-factor 1
+
+bin/kafka-topics.sh --create --topic DS1_binance_normalized_stream --bootstrap-server localhost:9092 --partitions 10 --replication-factor 1
+
+bin/kafka-topics.sh --create --topic DS2_mexc_normalized_stream --bootstrap-server localhost:9092 --partitions 10 --replication-factor 1
+
+bin/kafka-topics.sh --create --topic unified_normalized_stream --bootstrap-server localhost:9092 --partitions 10 --replication-factor 1

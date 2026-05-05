@@ -66,7 +66,7 @@ services:
       timeout: 10s
       retries: 10
     restart: unless-stopped
-  
+    
   clickhouse:
     image: clickhouse/clickhouse-server:25.10-distroless
     platform: linux/arm64
@@ -107,6 +107,12 @@ services:
       - flink-checkpoints:/tmp/flink-checkpoints
       - ./flink-libs:/opt/flink/lib/extra   # mount a local folder with JARs
       - ..:/workspace
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/overview"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
 
   taskmanager:
@@ -126,13 +132,29 @@ services:
         parallelism.default: 10
         taskmanager.memory.process.size: 7168m
         taskmanager.memory.managed.fraction: 0.40
-        state.backend: rocksdb
         table.exec.source.idle-timeout: 1000
     volumes:
       - flink-checkpoints:/tmp/flink-checkpoints
       - ./flink-libs:/opt/flink/lib/extra
       - ..:/workspace
     restart: unless-stopped
+
+  # This service exists only to run the DDL and DML scripts that Flink relies on, since these do not persist between container rebuilds.
+  flink-init:
+    platform: linux/arm64
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile.flink
+    depends_on:
+      jobmanager:
+        condition: service_healthy
+      schema-registry:
+        condition: service_healthy
+    volumes:
+      - ./src/flink:/flink-sql
+    command: >
+      /usr/local/bin/python /workspace/src/flink/execute_all_sql_files.py
+    restart: "no"  # run once and exit
   
 volumes:
   kafka-data:

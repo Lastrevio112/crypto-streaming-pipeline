@@ -1,17 +1,18 @@
 from pyflink.datastream import StreamExecutionEnvironment
-from pyflink.datastream.state_backend import EmbeddedRocksDBStateBackend
 from pyflink.table import StreamTableEnvironment, EnvironmentSettings
+import os
 
 # Setup
 env = StreamExecutionEnvironment.get_execution_environment()
 
-# RocksDB state backend
-backend = EmbeddedRocksDBStateBackend()
-env.set_state_backend(backend)
-
 # Table environment
 settings = EnvironmentSettings.new_instance().in_streaming_mode().build()
 t_env = StreamTableEnvironment.create(env, settings)
+
+# I wrote this function so I can add the file name without the full absolute path when calling the other function
+def computePath(path = str) -> str:
+    SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(SCRIPT_DIR, path)
 
 # Read all queries from a .sql file in the specified path, tokenize them by ; and execute them
 def execute_sql_file(t_env, file_path, stmt_set=None):
@@ -22,4 +23,14 @@ def execute_sql_file(t_env, file_path, stmt_set=None):
                 if stmt_set:        #We add DML statements to the statement set to execute them all at once at the end of this file
                     stmt_set.add_insert_sql(statement)
                 else:               #Otherwise, we simply execute DDL statements
+                    print("=== EXECUTING ===")
+                    print(statement)
                     t_env.execute_sql(statement)
+
+stmt_set = t_env.create_statement_set()
+
+execute_sql_file(t_env, computePath('DDL_flink_normalization.sql'), stmt_set=None)
+#print(t_env.list_tables())
+
+# Submit all DML statements as one Flink job here:
+#stmt_set.execute()
