@@ -3,4 +3,5 @@
 .vscode/
 __pycache__/
 websocket-proto/
-*/test_consumer*.py
+src/kafka_producers/DS1/test_consumer_not_in_production.py
+src/kafka_producers/DS2/test_consumer_2.py
