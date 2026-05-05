@@ -102,6 +102,7 @@ services:
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
+        jobmanager.memory.process.size: 1024m
     volumes:
       - flink-checkpoints:/tmp/flink-checkpoints
       - ./flink-libs:/opt/flink/lib/extra   # mount a local folder with JARs
@@ -121,7 +122,12 @@ services:
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
-        taskmanager.numberOfTaskSlots: 4
+        taskmanager.numberOfTaskSlots: 10
+        parallelism.default: 10
+        taskmanager.memory.process.size: 7168m
+        taskmanager.memory.managed.fraction: 0.40
+        state.backend: rocksdb
+        table.exec.source.idle-timeout: 1000
     volumes:
       - flink-checkpoints:/tmp/flink-checkpoints
       - ./flink-libs:/opt/flink/lib/extra
