@@ -9,11 +9,6 @@ env = StreamExecutionEnvironment.get_execution_environment()
 settings = EnvironmentSettings.new_instance().in_streaming_mode().build()
 t_env = StreamTableEnvironment.create(env, settings)
 
-t_env.get_config().set(
-    "pipeline.jars",
-    "file:///opt/flink/lib/flink-sql-avro-confluent-registry-2.0.0.jar"
-)
-
 # I wrote this function so I can add the file name without the full absolute path when calling the other function
 def computeAbsPath(path = str) -> str:
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))

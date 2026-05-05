@@ -19,19 +19,31 @@ RUN curl -L https://archive.apache.org/dist/flink/flink-${FLINK_VERSION}/flink-$
     && mv /opt/flink-${FLINK_VERSION} /opt/flink
 
 # Add Avro + Confluent registry JARs
-RUN curl -L https://repo1.maven.org/maven2/org/apache/flink/flink-sql-avro/${FLINK_VERSION}/flink-sql-avro-${FLINK_VERSION}.jar \
-        -o /opt/flink/lib/flink-sql-avro-${FLINK_VERSION}.jar \
-    && curl -L https://repo1.maven.org/maven2/org/apache/flink/flink-sql-avro-confluent-registry/${FLINK_VERSION}/flink-sql-avro-confluent-registry-${FLINK_VERSION}.jar \
+RUN curl -L https://repo1.maven.org/maven2/org/apache/flink/flink-avro/${FLINK_VERSION}/flink-avro-${FLINK_VERSION}.jar \
+    -o /opt/flink/lib/flink-avro-${FLINK_VERSION}.jar
+
+RUN curl -L https://repo1.maven.org/maven2/org/apache/flink/flink-sql-avro-confluent-registry/${FLINK_VERSION}/flink-sql-avro-confluent-registry-${FLINK_VERSION}.jar \
         -o /opt/flink/lib/flink-sql-avro-confluent-registry-${FLINK_VERSION}.jar
+
+RUN chmod -R 777 /opt/flink/lib/*.jar
+
+ENV FLINK_HOME=/opt/flink
+ENV FLINK_LIB_DIR=$FLINK_HOME/lib
+
+# 1. Force Flink to use the 'internal' planner (this bypasses the isolated loader)
+RUN echo "table.planner: internal" >> /opt/flink/conf/config.yaml
+
+# 2. Tell Flink to look at the Parent classloader first (where your JARs are)
+RUN echo "classloader.resolve-order: parent-first" >> /opt/flink/conf/config.yaml
+
+# 3. Disable the check that often blocks 'shaded' jars like Confluent's
+RUN echo "classloader.check-leaked-classloader: false" >> /opt/flink/conf/config.yaml
 
 WORKDIR /opt/flink
 ENV PATH=$PATH:/opt/flink/bin
 
 ENTRYPOINT ["/opt/flink/bin/flink-console.sh"]
+CMD ["taskmanager"]
 
 # Flink ports
 EXPOSE 8081 6123
-
-# Default entrypoint for Flink images
-#ENTRYPOINT ["/opt/flink/bin/kubernetes-jobmanager.sh"]
-
