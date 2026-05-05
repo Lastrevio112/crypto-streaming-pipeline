@@ -1,22 +1,27 @@
-# Start from a native ARM64 image
-FROM --platform=linux/arm64 eclipse-temurin:21-jre-jammy
+FROM --platform=linux/arm64 flink:2.0.0-scala_2.12-java11
 
-ENV FLINK_VERSION=2.0.0
-ENV SCALA_VERSION=2.12
+USER root
 
-# Install dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
+RUN apt-get update && apt-get install -y \
     python3 \
-    python3-pip \
+    python3-venv \
     python3-dev \
     build-essential \
-    && ln -s /usr/bin/python3 /usr/bin/python \
-    && rm -rf /var/lib/apt/lists/*
+    openjdk-11-jdk \
+    wget \
+ && rm -rf /var/lib/apt/lists/*
 
-# Download and Install Flink
-RUN curl -L https://archive.apache.org/dist/flink/flink-${FLINK_VERSION}/flink-${FLINK_VERSION}-bin-scala_${SCALA_VERSION}.tgz | tar -xzC /opt \
-    && mv /opt/flink-${FLINK_VERSION} /opt/flink
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-arm64
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+RUN pip install --upgrade pip setuptools wheel
+RUN pip install apache-flink==2.0.0
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
 # Add Avro + Confluent registry JARs
 RUN curl -L https://repo1.maven.org/maven2/org/apache/flink/flink-avro/${FLINK_VERSION}/flink-avro-${FLINK_VERSION}.jar \
@@ -27,23 +32,4 @@ RUN curl -L https://repo1.maven.org/maven2/org/apache/flink/flink-sql-avro-confl
 
 RUN chmod -R 777 /opt/flink/lib/*.jar
 
-ENV FLINK_HOME=/opt/flink
-ENV FLINK_LIB_DIR=$FLINK_HOME/lib
-
-# 1. Force Flink to use the 'internal' planner (this bypasses the isolated loader)
-RUN echo "table.planner: internal" >> /opt/flink/conf/config.yaml
-
-# 2. Tell Flink to look at the Parent classloader first (where your JARs are)
-RUN echo "classloader.resolve-order: parent-first" >> /opt/flink/conf/config.yaml
-
-# 3. Disable the check that often blocks 'shaded' jars like Confluent's
-RUN echo "classloader.check-leaked-classloader: false" >> /opt/flink/conf/config.yaml
-
-WORKDIR /opt/flink
-ENV PATH=$PATH:/opt/flink/bin
-
-ENTRYPOINT ["/opt/flink/bin/flink-console.sh"]
-CMD ["taskmanager"]
-
-# Flink ports
-EXPOSE 8081 6123
+USER flink
