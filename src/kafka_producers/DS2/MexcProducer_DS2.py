@@ -39,7 +39,7 @@ class MexcProducer_DS2(WebSocketProducer):
                 if data["code"] == 0 and data["msg"] != "PONG":
                     print(f"Subscription confirmed (id={data['id']})")
                 elif data["code"] == 0 and data["msg"] == "PONG":
-                    print("Ping has been responded with PONG.")
+                    print(f"Ping has been responded with PONG for id {data["id"]}.")
                 else:
                     print(f"Subscription failed: {data}")
             return
