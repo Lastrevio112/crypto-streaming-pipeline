@@ -55,12 +55,12 @@ def computeAbsPath(path: str) -> str:
 
 
 # Read all queries from a .sql file in the specified path, tokenize them by ; and execute them
-def execute_sql_file(t_env, file_path, stmt_set=None):
+def execute_sql_file(t_env, file_path, is_DML: bool):
     with open(file_path, 'r') as f:
         sql = f.read()
         for statement in sql.split(';'):
             if statement.strip():
-                if stmt_set:        #We add DML statements to the statement set to execute them all at once at the end of this file
+                if is_DML:        #We add DML statements to the statement set to execute them all at once at the end of this file
                     stmt_set.add_insert_sql(statement)
                 else:               #Otherwise, we simply execute DDL statements
                     t_env.execute_sql(statement)
@@ -69,22 +69,23 @@ def execute_sql_file(t_env, file_path, stmt_set=None):
 # Clean up existing jobs and get state
 last_savepoint = get_savepoint_and_terminate()
 
-# Creating the statement set for DML statements (DDL don't need one)
+# Creating the statement set for DML statements (DDL statements don't need one).
+# We have only one interconnected DAG for the entire pipeline, so we can keep this as a global variable for simplicity.
 stmt_set = t_env.create_statement_set()
 
 
 # Format: (relative path starting from src/flink, statement set)
 list_of_paths = [
-    ('DDL/DDL_flink_normalization.sql', None),
-    ('DML/load_normalization/load_DS1_binance_normalized_stream.sql', stmt_set),
-    ('DML/load_normalization/load_DS2_mexc_normalized_stream.sql', stmt_set),
-    ('DML/load_normalization/load_unified_normalized_stream.sql', stmt_set)
+    ('DDL/DDL_flink_normalization.sql', False),
+    ('DML/load_normalization/load_DS1_binance_normalized_stream.sql', True),
+    ('DML/load_normalization/load_DS2_mexc_normalized_stream.sql', True),
+    ('DML/load_normalization/load_unified_normalized_stream.sql', True)
 ]
 
 # In this loop, DDL statements will be executed while DML statements will be added to the statement set
-for path, stmt_set_ref in list_of_paths:
+for path, is_DML in list_of_paths:
     # print(path, stmt_set_ref)
-    execute_sql_file(t_env, computeAbsPath(path), stmt_set=stmt_set_ref)
+    execute_sql_file(t_env, file_path=computeAbsPath(path), is_DML=is_DML)
 
 
 # Resume from savepoint or start fresh if there isn't one
