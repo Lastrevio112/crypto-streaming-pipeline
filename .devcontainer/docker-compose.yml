@@ -153,7 +153,7 @@ services:
     volumes:
       - ./src/flink:/flink-sql
     command: >
-      /usr/local/bin/python /workspace/src/flink/execute_all_sql_files.py
+      flink run -py /workspace/src/flink/execute_all_sql_files.py -D rest.address=jobmanager -D rest.port=8081
     restart: "no"  # run once and exit
   
 volumes:

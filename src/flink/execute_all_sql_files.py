@@ -14,10 +14,11 @@ config = Configuration()
 config.set_string("rest.address", "jobmanager")
 config.set_string("rest.port", "8081")
 config.set_string("pipeline.name", JOB_NAME)
+config.set_string("execution.runtime-mode", "streaming")
+config.set_string("execution.target", "remote")
 
 env = StreamExecutionEnvironment.get_execution_environment(config)
-settings = EnvironmentSettings.new_instance().in_streaming_mode().build()
-t_env = StreamTableEnvironment.create(env, settings)
+t_env = StreamTableEnvironment.create(env)
 
 
 #Finds the running job by name, triggers savepoint, and cancels it.
@@ -61,7 +62,7 @@ def execute_sql_file(t_env, file_path, is_DML: bool):
         for statement in sql.split(';'):
             if statement.strip():
                 if is_DML:        #We add DML statements to the statement set to execute them all at once at the end of this file
-                    stmt_set.add_insert_sql(statement)
+                   stmt_set.add_insert_sql(statement)
                 else:               #Otherwise, we simply execute DDL statements
                     t_env.execute_sql(statement)
                     
@@ -95,5 +96,6 @@ if last_savepoint:
 
 # Execute all DML statements as a named job for future idempotency
 print(f"Launching {JOB_NAME}...")
+print(env._j_stream_execution_environment.getConfiguration().toMap())
 result = stmt_set.execute()
 print(result.get_job_client())
