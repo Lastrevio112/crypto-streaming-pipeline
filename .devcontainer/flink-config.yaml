@@ -1,0 +1,24 @@
+jobmanager:
+  rpc:
+    address: jobmanager
+    port: 6123
+  bind-host: 0.0.0.0
+  memory:
+    process:
+      size: 1600m
+taskmanager:
+  bind-host: 0.0.0.0
+  memory:
+    process:
+      size: 7168m
+    managed:
+      fraction: 0.40
+  numberOfTaskSlots: 10
+parallelism:
+  default: 10
+rest:
+  address: 0.0.0.0
+table:
+  exec:
+    source:
+      idle-timeout: 1000

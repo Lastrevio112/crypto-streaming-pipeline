@@ -35,4 +35,6 @@ RUN curl -L https://repo1.maven.org/maven2/org/apache/flink/flink-sql-connector-
 
 RUN chmod -R 777 /opt/flink/lib/*.jar
 
+COPY .devcontainer/flink-config.yaml /opt/flink/conf/config.yaml
+
 USER flink

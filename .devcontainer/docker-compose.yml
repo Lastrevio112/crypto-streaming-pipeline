@@ -99,8 +99,7 @@ services:
     ports:
       - "8081:8081"   # Flink Web UI
     environment:
-      - |
-        FLINK_PROPERTIES=
+      FLINK_PROPERTIES: |
         jobmanager.rpc.address: jobmanager
         jobmanager.memory.process.size: 1024m
     volumes:
@@ -125,8 +124,7 @@ services:
     depends_on:
       - jobmanager
     environment:
-      - |
-        FLINK_PROPERTIES=
+      FLINK_PROPERTIES: |
         jobmanager.rpc.address: jobmanager
         taskmanager.numberOfTaskSlots: 10
         parallelism.default: 10
