@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS binance_ds1_trades (
     p           STRING,        -- Price
     q           STRING,        -- Quantity
     `T`         BIGINT,        -- trade time, UNIX
-    m           BOOLEAN,        -- Is the buyer the market maker?
+    m           BOOLEAN,        -- Is the buyer the market maker? True: sell trade, False: buy trade
     trade_ts AS TO_TIMESTAMP_LTZ(`T`, 3),  --not in source data, needed for watermark calculation
     WATERMARK FOR trade_ts AS trade_ts - INTERVAL '0.25' SECOND
 ) WITH (
@@ -61,7 +61,11 @@ SELECT
     CAST(TO_TIMESTAMP_LTZ(src.sendtime, 3) AS TIMESTAMP(3))     AS sent_time,
     src.symbol                                                  AS coin_symbol,
     CAST(deal.price    AS DECIMAL(21, 8))                       AS price,
-    CAST(deal.quantity AS DECIMAL(21, 8))                       AS quantity
+    CAST(deal.quantity AS DECIMAL(21, 8))                       AS quantity,
+    CASE 
+        WHEN deal.tradetype = 1 THEN 'buy'
+        ELSE 'sell'
+    END                                                         AS is_buy_or_sell
 FROM mexc_ds2_trades AS src
 CROSS JOIN UNNEST(src.publicdeals.dealsList) AS deal(price, quantity, tradetype, `time`);
 
@@ -76,6 +80,7 @@ CREATE TABLE IF NOT EXISTS DS1_binance_normalized_stream (
     coin_symbol     STRING,
     price           DECIMAL(21, 8),
     quantity        DECIMAL(21, 8),
+    is_buy_or_sell  STRING,
     WATERMARK FOR trade_time AS trade_time - INTERVAL '0.25' SECOND
 ) WITH (
     'connector'                     = 'kafka',
@@ -95,6 +100,7 @@ CREATE TABLE IF NOT EXISTS DS2_mexc_normalized_stream (
     coin_symbol     STRING,
     price           DECIMAL(21, 8),
     quantity        DECIMAL(21, 8),
+    is_buy_or_sell  STRING,
     WATERMARK FOR trade_time AS trade_time - INTERVAL '0.25' SECOND 
 ) WITH (
     'connector'                     = 'kafka',
@@ -117,6 +123,7 @@ CREATE TABLE IF NOT EXISTS unified_normalized_stream (
     coin_symbol     STRING,
     price           DECIMAL(21, 8),
     quantity        DECIMAL(21, 8),
+    is_buy_or_sell  STRING,
     data_source_id  INT,
     WATERMARK FOR trade_time AS trade_time - INTERVAL '0.25' SECOND
 ) WITH (

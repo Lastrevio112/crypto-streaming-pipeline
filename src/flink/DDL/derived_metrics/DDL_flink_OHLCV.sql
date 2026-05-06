@@ -14,7 +14,8 @@ CREATE TABLE derived_ohlcv_1m_tumbling(
     aggressive_sell_volume  DECIMAL(21, 8),
     net_flow                DECIMAL(21, 8),
     buy_sell_ratio          DECIMAL(21, 8),
-    PRIMARY KEY (coin_symbol) NOT ENFORCED
+    PRIMARY KEY (coin_symbol, window_start) NOT ENFORCED,
+    WATERMARK FOR window_end AS window_end - INTERVAL '0.35' SECOND
 )
 WITH (
     'connector'                     = 'upsert-kafka',
@@ -42,7 +43,8 @@ CREATE TABLE derived_ohlcv_5m_tumbling(
     aggressive_sell_volume  DECIMAL(21, 8),
     net_flow                DECIMAL(21, 8),
     buy_sell_ratio          DECIMAL(21, 8),
-    PRIMARY KEY (coin_symbol) NOT ENFORCED
+    PRIMARY KEY (coin_symbol, window_start) NOT ENFORCED,
+    WATERMARK FOR window_end AS window_end - INTERVAL '0.35' SECOND
 )
 WITH (
     'connector'                     = 'upsert-kafka',
@@ -70,7 +72,8 @@ CREATE TABLE derived_ohlcv_5m_sliding(
     aggressive_sell_volume  DECIMAL(21, 8),
     net_flow                DECIMAL(21, 8),
     buy_sell_ratio          DECIMAL(21, 8),
-    PRIMARY KEY (coin_symbol) NOT ENFORCED
+    PRIMARY KEY (coin_symbol, window_start) NOT ENFORCED,
+    WATERMARK FOR window_end AS window_end - INTERVAL '0.35' SECOND
 )
 WITH (
     'connector'                     = 'upsert-kafka',

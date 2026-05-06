@@ -1,5 +1,5 @@
 INSERT INTO DS1_binance_normalized_stream(
-    trade_id, trade_time, sent_time, coin_symbol, price, quantity
+    trade_id, trade_time, sent_time, coin_symbol, price, quantity, is_buy_or_sell
 )
 SELECT
     CONCAT('binance_', CAST(t AS STRING))                   AS trade_id,
@@ -7,5 +7,9 @@ SELECT
     CAST(TO_TIMESTAMP_LTZ(`E`, 3) AS TIMESTAMP(3))          AS sent_time,   --time it was sent by the websocket
     s                                                       AS coin_symbol,
     CAST(p AS DECIMAL(21, 8))                               AS price,
-    CAST(q AS DECIMAL(21, 8))                               AS quantity
+    CAST(q AS DECIMAL(21, 8))                               AS quantity,
+    CASE
+        WHEN TRUE THEN 'sell'
+        ELSE 'buy'
+    END                                                     AS is_buy_or_sell
 FROM binance_ds1_trades;
