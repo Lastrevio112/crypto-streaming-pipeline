@@ -56,12 +56,12 @@ SELECT
         CAST(deal.`time` AS STRING),
         deal.price,
         deal.quantity
-    )))                                             AS trade_id,
-    TO_TIMESTAMP_LTZ(deal.`time`, 3)                AS trade_time,
-    TO_TIMESTAMP_LTZ(src.sendtime, 3)               AS sent_time,
-    src.symbol                                      AS coin_symbol,
-    CAST(deal.price    AS DECIMAL(18, 8))           AS price,
-    CAST(deal.quantity AS DECIMAL(18, 8))           AS quantity
+    )))                                                         AS trade_id,
+    CAST(TO_TIMESTAMP_LTZ(deal.`time`, 3) AS TIMESTAMP(3))      AS trade_time,
+    CAST(TO_TIMESTAMP_LTZ(src.sendtime, 3) AS TIMESTAMP(3))     AS sent_time,
+    src.symbol                                                  AS coin_symbol,
+    CAST(deal.price    AS DECIMAL(18, 8))                       AS price,
+    CAST(deal.quantity AS DECIMAL(18, 8))                       AS quantity
 FROM mexc_ds2_trades AS src
 CROSS JOIN UNNEST(src.publicdeals.dealsList) AS deal(price, quantity, tradetype, `time`);
 
@@ -70,8 +70,8 @@ CROSS JOIN UNNEST(src.publicdeals.dealsList) AS deal(price, quantity, tradetype,
 
 CREATE TABLE IF NOT EXISTS DS1_binance_normalized_stream (
     trade_id        STRING,     -- prefixed: "binance_<t>"
-    trade_time      TIMESTAMP_LTZ(3),
-    sent_time       TIMESTAMP_LTZ(3),
+    trade_time      TIMESTAMP(3),
+    sent_time       TIMESTAMP(3),
     proc_time    AS PROCTIME(), -- trade_time < sent_time < proc_time, always.
     coin_symbol     STRING,
     price           DECIMAL(18, 8),
@@ -81,14 +81,16 @@ CREATE TABLE IF NOT EXISTS DS1_binance_normalized_stream (
     'connector'                     = 'kafka',
     'topic'                         = 'DS1_binance_normalized_stream',
     'properties.bootstrap.servers'  = 'kafka:9092',
+    'properties.group.id'           = 'DS1_binance_normalized_stream',
+    'scan.startup.mode'             = 'latest-offset',
     'format'                        = 'avro-confluent',
     'avro-confluent.url'            = 'http://schema-registry:8081'
 );
 
 CREATE TABLE IF NOT EXISTS DS2_mexc_normalized_stream (
     trade_id        STRING,
-    trade_time      TIMESTAMP_LTZ(3),
-    sent_time       TIMESTAMP_LTZ(3),
+    trade_time      TIMESTAMP(3),
+    sent_time       TIMESTAMP(3),
     proc_time    AS PROCTIME(),
     coin_symbol     STRING,
     price           DECIMAL(18, 8),
@@ -98,6 +100,8 @@ CREATE TABLE IF NOT EXISTS DS2_mexc_normalized_stream (
     'connector'                     = 'kafka',
     'topic'                         = 'DS2_mexc_normalized_stream',
     'properties.bootstrap.servers'  = 'kafka:9092',
+    'properties.group.id'           = 'DS2_mexc_normalized_stream',
+    'scan.startup.mode'             = 'latest-offset',
     'format'                        = 'avro-confluent',
     'avro-confluent.url'            = 'http://schema-registry:8081'
 );
@@ -107,8 +111,8 @@ CREATE TABLE IF NOT EXISTS DS2_mexc_normalized_stream (
 
 CREATE TABLE IF NOT EXISTS unified_normalized_stream (
     trade_id        STRING,     -- prefixed with data source name to ensure global uniqueness
-    trade_time      TIMESTAMP_LTZ(3),
-    sent_time       TIMESTAMP_LTZ(3),
+    trade_time      TIMESTAMP(3),
+    sent_time       TIMESTAMP(3),
     proc_time    AS PROCTIME(),
     coin_symbol     STRING,
     price           DECIMAL(18, 8),
@@ -119,6 +123,8 @@ CREATE TABLE IF NOT EXISTS unified_normalized_stream (
     'connector'                     = 'kafka',
     'topic'                         = 'unified_normalized_stream',
     'properties.bootstrap.servers'  = 'kafka:9092',
+    'properties.group.id'           = 'unified_normalized_stream',
+    'scan.startup.mode'             = 'latest-offset',
     'format'                        = 'avro-confluent',
     'avro-confluent.url'            = 'http://schema-registry:8081'
 );
