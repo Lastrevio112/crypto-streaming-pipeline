@@ -137,6 +137,32 @@ services:
       - ..:/workspace
     restart: unless-stopped
 
+  # This service starts the data generation each time the container is rebuilt by running our two producers
+  kafka-producers-init:
+    platform: linux/arm64
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    depends_on:
+      kafka:
+        condition: service_healthy
+      schema-registry:
+        condition: service_healthy
+    volumes:
+      - ..:/workspace
+    environment:
+      - PYTHONPATH=/workspace
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    env_file:
+      - ../.env
+    command: >
+      bash -c "
+        python /workspace/src/kafka_producers/DS1/run_DS1_producer.py &
+        python /workspace/src/kafka_producers/DS2/run_DS2_producer.py &
+        wait
+      "
+    restart: unless-stopped   #If one producer crashes, the container exits and restart: unless-stopped brings it back up
+
   # This service exists only to run the DDL and DML scripts that Flink relies on, since these do not persist between container rebuilds.
   flink-init:
     platform: linux/arm64
