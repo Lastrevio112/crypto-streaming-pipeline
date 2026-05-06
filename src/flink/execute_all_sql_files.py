@@ -1,17 +1,24 @@
 from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table import StreamTableEnvironment, EnvironmentSettings
+from pyflink.common import Configuration
 import os
 import requests
 import time
 
-FLINK_REST = "http://localhost:8081"
+FLINK_REST = "http://jobmanager:8081"
 SAVEPOINT_DIR = "file:///tmp/flink-savepoints"
 JOB_NAME = "flink_pipeline"
 
 # Setup
-env = StreamExecutionEnvironment.get_execution_environment()
+config = Configuration()
+config.set_string("rest.address", "jobmanager")
+config.set_string("rest.port", "8081")
+config.set_string("pipeline.name", JOB_NAME)
+
+env = StreamExecutionEnvironment.get_execution_environment(config)
 settings = EnvironmentSettings.new_instance().in_streaming_mode().build()
 t_env = StreamTableEnvironment.create(env, settings)
+
 
 #Finds the running job by name, triggers savepoint, and cancels it.
 def get_savepoint_and_terminate():
@@ -42,7 +49,7 @@ def get_savepoint_and_terminate():
     
 
 # I wrote this function so I can add the file name without the full absolute path when calling the other function
-def computeAbsPath(path = str) -> str:
+def computeAbsPath(path: str) -> str:
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(SCRIPT_DIR, path)
 
@@ -56,9 +63,8 @@ def execute_sql_file(t_env, file_path, stmt_set=None):
                 if stmt_set:        #We add DML statements to the statement set to execute them all at once at the end of this file
                     stmt_set.add_insert_sql(statement)
                 else:               #Otherwise, we simply execute DDL statements
-                    print("=== EXECUTING ===")
-                    print(statement + '\n')
                     t_env.execute_sql(statement)
+                    
 
 # Clean up existing jobs and get state
 last_savepoint = get_savepoint_and_terminate()
@@ -77,6 +83,7 @@ list_of_paths = [
 
 # In this loop, DDL statements will be executed while DML statements will be added to the statement set
 for path, stmt_set_ref in list_of_paths:
+    # print(path, stmt_set_ref)
     execute_sql_file(t_env, computeAbsPath(path), stmt_set=stmt_set_ref)
 
 
@@ -87,5 +94,5 @@ if last_savepoint:
 
 # Execute all DML statements as a named job for future idempotency
 print(f"Launching {JOB_NAME}...")
-t_env.get_config().set("pipeline.name", JOB_NAME)
-stmt_set.execute()
+result = stmt_set.execute()
+print(result.get_job_client())

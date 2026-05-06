@@ -9,4 +9,4 @@ UNION ALL
 SELECT 
     trade_id, trade_time, sent_time, coin_symbol, price, quantity,
     2 AS data_source_id
-FROM DS2_mexc_normalized_stream
+FROM DS2_mexc_normalized_stream;

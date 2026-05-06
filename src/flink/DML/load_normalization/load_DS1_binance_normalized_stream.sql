@@ -8,4 +8,4 @@ SELECT
     s                                                       AS coin_symbol,
     CAST(p AS DECIMAL(18, 8))                               AS price,
     CAST(q AS DECIMAL(18, 8))                               AS quantity
-FROM binance_ds1_trades
+FROM binance_ds1_trades;
