@@ -60,8 +60,8 @@ SELECT
     CAST(TO_TIMESTAMP_LTZ(deal.`time`, 3) AS TIMESTAMP(3))      AS trade_time,
     CAST(TO_TIMESTAMP_LTZ(src.sendtime, 3) AS TIMESTAMP(3))     AS sent_time,
     src.symbol                                                  AS coin_symbol,
-    CAST(deal.price    AS DECIMAL(18, 8))                       AS price,
-    CAST(deal.quantity AS DECIMAL(18, 8))                       AS quantity
+    CAST(deal.price    AS DECIMAL(21, 8))                       AS price,
+    CAST(deal.quantity AS DECIMAL(21, 8))                       AS quantity
 FROM mexc_ds2_trades AS src
 CROSS JOIN UNNEST(src.publicdeals.dealsList) AS deal(price, quantity, tradetype, `time`);
 
@@ -74,8 +74,8 @@ CREATE TABLE IF NOT EXISTS DS1_binance_normalized_stream (
     sent_time       TIMESTAMP(3),
     proc_time    AS PROCTIME(), -- trade_time < sent_time < proc_time, always.
     coin_symbol     STRING,
-    price           DECIMAL(18, 8),
-    quantity        DECIMAL(18, 8),
+    price           DECIMAL(21, 8),
+    quantity        DECIMAL(21, 8),
     WATERMARK FOR trade_time AS trade_time - INTERVAL '0.25' SECOND
 ) WITH (
     'connector'                     = 'kafka',
@@ -93,8 +93,8 @@ CREATE TABLE IF NOT EXISTS DS2_mexc_normalized_stream (
     sent_time       TIMESTAMP(3),
     proc_time    AS PROCTIME(),
     coin_symbol     STRING,
-    price           DECIMAL(18, 8),
-    quantity        DECIMAL(18, 8),
+    price           DECIMAL(21, 8),
+    quantity        DECIMAL(21, 8),
     WATERMARK FOR trade_time AS trade_time - INTERVAL '0.25' SECOND 
 ) WITH (
     'connector'                     = 'kafka',
@@ -115,8 +115,8 @@ CREATE TABLE IF NOT EXISTS unified_normalized_stream (
     sent_time       TIMESTAMP(3),
     proc_time    AS PROCTIME(),
     coin_symbol     STRING,
-    price           DECIMAL(18, 8),
-    quantity        DECIMAL(18, 8),
+    price           DECIMAL(21, 8),
+    quantity        DECIMAL(21, 8),
     data_source_id  INT,
     WATERMARK FOR trade_time AS trade_time - INTERVAL '0.25' SECOND
 ) WITH (
