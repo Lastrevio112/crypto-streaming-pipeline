@@ -148,10 +148,17 @@ services:
         condition: service_healthy
       schema-registry:
         condition: service_healthy
+      taskmanager:
+        condition: service_started
     volumes:
-      - ./src/flink:/flink-sql
+      - ..:/workspace
+    # We hard-coded a wait period of 20 seconds for the taskmanager to register. Unfortunately there's no way to check whether the taskmanager service is healthy so we have to do it the 'ugly' way.
     command: >
-      flink run -py /workspace/src/flink/execute_all_sql_files.py -D rest.address=jobmanager -D rest.port=8081
+      bash -c "
+        echo 'Waiting for taskmanager to register...' &&
+        sleep 20 &&
+        flink run -py /workspace/src/flink/execute_all_sql_files.py -D rest.address=jobmanager -D rest.port=8081
+      "
     restart: "no"  # run once and exit
   
 volumes:
