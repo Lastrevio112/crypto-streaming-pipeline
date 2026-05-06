@@ -1,5 +1,6 @@
 import os, sys
 import json
+import threading
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroSerializer
 from confluent_kafka.serialization import SerializationContext, MessageField
@@ -11,7 +12,7 @@ from src.proto import PushDataV3ApiWrapper_pb2
 from src.kafka_producers import WebSocketProducer, custom_partitioner
 
 class MexcProducer_DS2(WebSocketProducer):
-    def __init__(self, url, streams, producer, topic, schema_registry_url, no_of_ms=100):
+    def __init__(self, url, streams, producer, topic, schema_registry_url, no_of_ms=100, ping_interval_seconds=50):
         super().__init__(url, streams, producer, topic)
 
         schema_registry_client = SchemaRegistryClient({"url": schema_registry_url})
@@ -28,14 +29,17 @@ class MexcProducer_DS2(WebSocketProducer):
 
         self.topic = topic
         self.no_of_ms = no_of_ms # MEXC makes us choose between 10ms and 100ms latency, we choose 100ms by default
+        self.ping_interval_seconds = ping_interval_seconds
     
     def on_message(self, ws, message):
         # subscription response looks like {"id": 0, "code": 0, "msg": "spot@public.aggre.deals.v3.api.pb@100ms@BTCUSDT"}
         if isinstance(message, str):
             data = json.loads(message)
             if "code" in data:
-                if data["code"] == 0:
+                if data["code"] == 0 and data["msg"] != "PONG":
                     print(f"Subscription confirmed (id={data['id']})")
+                elif data["code"] == 0 and data["msg"] == "PONG":
+                    print("Ping has been responded with PONG.")
                 else:
                     print(f"Subscription failed: {data}")
             return
@@ -98,3 +102,23 @@ class MexcProducer_DS2(WebSocketProducer):
 
         ws.send(json.dumps(subscribe_message))
         print("Connected and subscription sent to MEXC DS2 stream.")
+    
+    # Overriding the base class's run method in order to send a ping message every 50 seconds, as MEXC websocket times out after 60 seconds of inactivity.
+    def run(self):
+        self._stop_ping = threading.Event()
+    
+        def ping_loop():
+            while not self._stop_ping.wait(self.ping_interval_seconds):  # wait returns True if set, False on timeout
+                try:
+                    self.ws.send(json.dumps({"method": "PING"}))
+                except Exception as e:
+                    print(f"Ping failed: {e}")
+                    break
+
+        ping_thread = threading.Thread(target=ping_loop, daemon=True)
+        ping_thread.start()
+
+        try:
+            super().run()
+        finally:
+            self._stop_ping.set()
