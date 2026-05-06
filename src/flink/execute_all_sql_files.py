@@ -80,7 +80,9 @@ list_of_paths = [
     ('DDL/DDL_flink_normalization.sql', False),
     ('DML/load_normalization/load_DS1_binance_normalized_stream.sql', True),
     ('DML/load_normalization/load_DS2_mexc_normalized_stream.sql', True),
-    ('DML/load_normalization/load_unified_normalized_stream.sql', True)
+    ('DML/load_normalization/load_unified_normalized_stream.sql', True),
+
+    ('DDL/derived_metrics/DDL_flink_OHLCV.sql', False)
 ]
 
 # In this loop, DDL statements will be executed while DML statements will be added to the statement set

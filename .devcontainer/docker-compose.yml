@@ -183,9 +183,10 @@ services:
       bash -c "
         echo 'Waiting for taskmanager to register...' &&
         sleep 20 &&
-        flink run -py /workspace/src/flink/execute_all_sql_files.py -D rest.address=jobmanager -D rest.port=8081
+        flink run -py /workspace/src/flink/execute_all_sql_files.py -D rest.address=jobmanager -D rest.port=8081 &&
+        wait
       "
-    restart: "no"  # run once and exit
+    restart: "no"
   
 volumes:
   kafka-data:
