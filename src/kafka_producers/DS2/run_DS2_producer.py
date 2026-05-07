@@ -1,8 +1,10 @@
 from confluent_kafka import Producer
 import json
-import os
+import os, sys
 import threading
 import time
+
+sys.path.append('/workspace/src/kafka_producers')
 
 from MexcProducer_DS2 import MexcProducer_DS2
 from run_with_reconnect import run_with_reconnect

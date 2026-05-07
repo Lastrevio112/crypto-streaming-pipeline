@@ -43,10 +43,10 @@ class WebSocketProducer(ABC):
         pass
 
     def ping_pong(self, ping_json_message, ping_interval_seconds):
-        if not self._stop_ping.is_set() and hasattr(self, '_ping_thread') and self._ping_thread.is_alive():
+        if self._ping_thread is not None and self._ping_thread.is_alive():
             return  # do not call if it's already running
-
-        self._stop_ping = threading.Event()
+        
+        self._stop_ping.clear()
     
         def ping_loop():
             while not self._stop_ping.wait(ping_interval_seconds):  # wait returns True if set, False on timeout

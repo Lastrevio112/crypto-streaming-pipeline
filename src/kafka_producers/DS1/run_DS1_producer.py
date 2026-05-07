@@ -1,6 +1,8 @@
 from confluent_kafka import Producer
 import json
-import os
+import os, sys
+
+sys.path.append('/workspace/src/kafka_producers')
 
 from BinanceProducer_DS1 import BinanceProducer_DS1
 from run_with_reconnect import run_with_reconnect
