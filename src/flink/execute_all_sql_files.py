@@ -1,6 +1,7 @@
 from pyflink.datastream import StreamExecutionEnvironment
-from pyflink.table import StreamTableEnvironment, EnvironmentSettings
+from pyflink.table import StreamTableEnvironment
 from pyflink.common import Configuration
+from pyflink.datastream import CheckpointConfig, CheckpointingMode, ExternalizedCheckpointRetention
 import os
 import requests
 import time
@@ -17,37 +18,27 @@ config.set_string("pipeline.name", JOB_NAME)
 config.set_string("execution.runtime-mode", "streaming")
 config.set_string("execution.target", "remote")
 
+# Here we keep all checkpoints in the same filesystem and sub-folder that will be mounted to a Docker volume. 
+# This is so all jobs can re-use the same checkpoint config, even if a container is rebuilt. 
+# Since we only have one DAG/pipeline, centralizing all our checkpoints into one place is not an issue.
+config.set_string("execution.checkpointing.storage", "filesystem")
+config.set_string("execution.checkpointing.dir", "file:///opt/flink/checkpoints")
+
 env = StreamExecutionEnvironment.get_execution_environment(config)
+
+# Checkpointing setup:
+CHECKPOINTING_INTERVAL_MS = 1000 
+CHECKPOINTING_TIMEOUT_MS = 60000 # checkpoints have to complete within one minute, or are discarded
+
+check_config = env.get_checkpoint_config()
+check_config.set_checkpointing_mode(CheckpointingMode.EXACTLY_ONCE)
+check_config.set_checkpoint_interval(CHECKPOINTING_INTERVAL_MS)
+check_config.set_checkpoint_timeout(CHECKPOINTING_TIMEOUT_MS)
+check_config.set_max_concurrent_checkpoints(1)
+check_config.set_externalized_checkpoint_retention(ExternalizedCheckpointRetention.RETAIN_ON_CANCELLATION) # very important, otherwise nothing would be kept after a docker container rebuild
+
 t_env = StreamTableEnvironment.create(env)
 
-
-#Finds the running job by name, triggers savepoint, and cancels it.
-def get_savepoint_and_terminate():
-    try:
-        jobs = requests.get(f"{FLINK_REST}/jobs").json()['jobs']
-        running_jobs = [j for j in jobs if j['name'] == JOB_NAME and j['status'] == 'RUNNING']
-        
-        if not running_jobs:
-            return None
-
-        job_id = running_jobs[0]['id']
-        print(f"Found running job {job_id}. Triggering savepoint and stopping...")
-        
-        # Trigger stop with savepoint
-        payload = {"targetDirectory": SAVEPOINT_DIR, "drain": True}
-        trigger = requests.post(f"{FLINK_REST}/jobs/{job_id}/stop", json=payload).json()
-        trigger_id = trigger['request-id']
-
-        # Poll for completion
-        while True:
-            status = requests.get(f"{FLINK_REST}/jobs/{job_id}/savepoints/{trigger_id}").json()
-            if status['status']['id'] == 'COMPLETED':
-                return status['operation']['location']
-            time.sleep(2)
-    except Exception as e:
-        print(f"No existing job found or error connecting: {e}")
-        return None
-    
 
 # I wrote this function so I can add the file name without the full absolute path when calling the other function
 def computeAbsPath(path: str) -> str:
@@ -66,9 +57,6 @@ def execute_sql_file(t_env, file_path, is_DML: bool):
                 else:               #Otherwise, we simply execute DDL statements
                     t_env.execute_sql(statement)
                     
-
-# Clean up existing jobs and get state
-last_savepoint = get_savepoint_and_terminate()
 
 # Creating the statement set for DML statements (DDL statements don't need one).
 # We have only one interconnected DAG for the entire pipeline, so we can keep this as a global variable for simplicity.
@@ -90,11 +78,6 @@ for path, is_DML in list_of_paths:
     # print(path, stmt_set_ref)
     execute_sql_file(t_env, file_path=computeAbsPath(path), is_DML=is_DML)
 
-
-# Resume from savepoint or start fresh if there isn't one
-if last_savepoint:
-    print(f"Resuming from: {last_savepoint}")
-    t_env.get_config().get_configuration().set_string("execution.savepoint.path", last_savepoint)
 
 # Execute all DML statements as a named job for future idempotency
 print(f"Launching {JOB_NAME}...")
