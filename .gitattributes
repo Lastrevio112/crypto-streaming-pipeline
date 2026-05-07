@@ -1,2 +1,5 @@
 *.sql linguist-detectable=true
 *.sql linguist-generated=false
+*.sh linguist-detectable=true
+*.sh linguist-generated=false
+*.sh linguist-documentation=false
