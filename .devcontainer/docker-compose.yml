@@ -153,6 +153,7 @@ services:
     environment:
       - PYTHONPATH=/workspace
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - PYTHONBUFFERED=1
     env_file:
       - ../.env
     command: >
@@ -176,6 +177,8 @@ services:
         condition: service_healthy
       taskmanager:
         condition: service_started
+    environment:
+      - PYTHONUNBUFFERED=1
     volumes:
       - ..:/workspace
     # We hard-coded a wait period of 20 seconds for the taskmanager to register. Unfortunately there's no way to check whether the taskmanager service is healthy so we have to do it the 'ugly' way.
