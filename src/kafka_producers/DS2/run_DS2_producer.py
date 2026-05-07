@@ -5,14 +5,7 @@ import threading
 import time
 
 from MexcProducer_DS2 import MexcProducer_DS2
-
-def run_with_reconnect(producer, interval_hours=23):
-    while True:
-        t = threading.Thread(target=producer.run, daemon=True)
-        t.start()
-        time.sleep(interval_hours * 3600)
-        producer.stop()  
-        print(f"Reconnecting after {interval_hours}h...")
+from run_with_reconnect import run_with_reconnect
 
 if __name__ == "__main__":
     BOOTSTRAP = "kafka:9092"

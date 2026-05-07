@@ -10,6 +10,9 @@ class WebSocketProducer(ABC):
         self.producer = producer
         self.topic = topic
         
+        self.reset()
+
+    def reset(self):
         self.ws = websocket.WebSocketApp(
             self.url,
             on_open=self.on_open,

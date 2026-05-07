@@ -1,7 +1,9 @@
-from BinanceProducer_DS1 import BinanceProducer_DS1
 from confluent_kafka import Producer
 import json
 import os
+
+from BinanceProducer_DS1 import BinanceProducer_DS1
+from run_with_reconnect import run_with_reconnect
 
 if __name__ == "__main__":
     BOOTSTRAP = "kafka:9092"
@@ -16,4 +18,4 @@ if __name__ == "__main__":
         streams = [s.lower() + "@trade" for s in data["symbols"]]
     
     binance_producer = BinanceProducer_DS1(URL_TO_BINANCE, streams, producer, TOPIC, SCHEMA_REGISTRY_URL)
-    binance_producer.run()
+    run_with_reconnect(binance_producer)
