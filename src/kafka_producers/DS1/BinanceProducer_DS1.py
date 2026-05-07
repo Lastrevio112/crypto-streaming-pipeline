@@ -33,6 +33,12 @@ class BinanceProducer_DS1(WebSocketProducer):
             else:
                 print(f"Subscription failed: {data}")
             return
+        
+        # Binance warns 10 minutes before 24h disconnection
+        if data.get("e") == "serverShutdown":
+            print("serverShutdown received, closing connection for reconnect...")
+            ws.close()
+            return
 
         symbol = data.get("s")  # we get the cryptocurrency here, which is also the partition key
         partition = custom_partitioner(symbol, num_partitions=int(os.getenv("NUM_PARTITIONS")))
@@ -59,3 +65,4 @@ class BinanceProducer_DS1(WebSocketProducer):
         }
         ws.send(json.dumps(subscribe_message))
         print("Connected and subscription sent to Binance DS1 stream.")
+    

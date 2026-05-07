@@ -103,20 +103,11 @@ class MexcProducer_DS2(WebSocketProducer):
         ws.send(json.dumps(subscribe_message))
         print("Connected and subscription sent to MEXC DS2 stream.")
     
-    # Overriding the base class's run method in order to send a ping message every 50 seconds, as MEXC websocket times out after 60 seconds of inactivity.
-    def run(self):
-        self._stop_ping = threading.Event()
-    
-        def ping_loop():
-            while not self._stop_ping.wait(self.ping_interval_seconds):  # wait returns True if set, False on timeout
-                try:
-                    self.ws.send(json.dumps({"method": "PING"}))
-                except Exception as e:
-                    print(f"Ping failed: {e}")
-                    break
-
-        ping_thread = threading.Thread(target=ping_loop, daemon=True)
-        ping_thread.start()
+    def run(self): 
+        super().ping_pong(
+            ping_json_message = json.dumps({"method": "PING"}),
+            ping_interval_seconds = 50  #MEXC disconnects after 60 seconds of inactivity
+        )
 
         try:
             super().run()
