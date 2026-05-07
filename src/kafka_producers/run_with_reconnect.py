@@ -10,4 +10,5 @@ def run_with_reconnect(producer, interval_hours=23):
         time.sleep(interval_hours * 3600)
         producer.stop()  
         t.join(timeout=10)  # wait for clean shutdown before restarting
+        producer.reset()  # recreate WebSocketApp before next iteration
         print(f"Reconnecting after {interval_hours}h...")
