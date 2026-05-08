@@ -59,7 +59,7 @@ SELECT
     )))                                                         AS trade_id,
     CAST(TO_TIMESTAMP_LTZ(deal.`time`, 3) AS TIMESTAMP(3))      AS trade_time,
     CAST(TO_TIMESTAMP_LTZ(src.sendtime, 3) AS TIMESTAMP(3))     AS sent_time,
-    src.symbol                                                  AS coin_symbol,
+    COALESCE(src.symbol, 'unknown_coin')                        AS coin_symbol,
     CAST(deal.price    AS DECIMAL(21, 8))                       AS price,
     CAST(deal.quantity AS DECIMAL(21, 8))                       AS quantity,
     CASE 
