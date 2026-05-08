@@ -89,9 +89,12 @@ WITH (
     'properties.bootstrap.servers'  = 'kafka:9092',
     'properties.group.id'           = 'DS1_binance_normalized_stream',
     'scan.startup.mode'             = 'latest-offset',
-    'format'                        = 'avro-confluent',
-    'avro-confluent.url'            = 'http://schema-registry:8081',
-    'sink.partitioner'              = 'com.crypto.SymbolPartitioner'
+    'value.avro-confluent.url'      = 'http://schema-registry:8081',
+    'sink.partitioner'              = 'com.crypto.SymbolPartitioner',
+    'key.format'                    = 'raw',
+    'key.fields'                    = 'coin_symbol',
+    'value.format'                  = 'avro-confluent',
+    'value.fields-include'          = 'EXCEPT_KEY'
 );
 
 CREATE TABLE IF NOT EXISTS DS2_mexc_normalized_stream (
@@ -111,9 +114,12 @@ WITH (
     'properties.bootstrap.servers'  = 'kafka:9092',
     'properties.group.id'           = 'DS2_mexc_normalized_stream',
     'scan.startup.mode'             = 'latest-offset',
-    'format'                        = 'avro-confluent',
-    'avro-confluent.url'            = 'http://schema-registry:8081',
-    'sink.partitioner'              = 'com.crypto.SymbolPartitioner'
+    'value.avro-confluent.url'      = 'http://schema-registry:8081',
+    'sink.partitioner'              = 'com.crypto.SymbolPartitioner',
+    'key.format'                    = 'raw',
+    'key.fields'                    = 'coin_symbol',
+    'value.format'                  = 'avro-confluent',
+    'value.fields-include'          = 'EXCEPT_KEY'
 );
 
 
@@ -137,7 +143,10 @@ WITH (
     'properties.bootstrap.servers'  = 'kafka:9092',
     'properties.group.id'           = 'unified_normalized_stream',
     'scan.startup.mode'             = 'latest-offset',
-    'format'                        = 'avro-confluent',
-    'avro-confluent.url'            = 'http://schema-registry:8081',
-    'sink.partitioner'              = 'com.crypto.SymbolPartitioner'
+    'value.avro-confluent.url'      = 'http://schema-registry:8081',
+    'sink.partitioner'              = 'com.crypto.SymbolPartitioner',
+    'key.format'                    = 'raw',
+    'key.fields'                    = 'coin_symbol',
+    'value.format'                  = 'avro-confluent',
+    'value.fields-include'          = 'EXCEPT_KEY'
 );

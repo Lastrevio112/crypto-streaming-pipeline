@@ -23,9 +23,12 @@ WITH (
     'properties.bootstrap.servers'  = 'kafka:9092',
     'properties.group.id'           = 'derived_ohlcv_1m_tumbling',
     'scan.startup.mode'             = 'latest-offset',
-    'format'                        = 'avro-confluent',
-    'avro-confluent.url'            = 'http://schema-registry:8081',
-    'sink.partitioner'              = 'com.crypto.SymbolPartitioner'
+    'value.avro-confluent.url'      = 'http://schema-registry:8081',
+    'sink.partitioner'              = 'com.crypto.SymbolPartitioner',
+    'key.format'                    = 'raw',
+    'key.fields'                    = 'coin_symbol',
+    'value.format'                  = 'avro-confluent',
+    'value.fields-include'          = 'EXCEPT_KEY'
 );
 
 CREATE TABLE derived_ohlcv_5m_tumbling(
@@ -53,9 +56,12 @@ WITH (
     'properties.bootstrap.servers'  = 'kafka:9092',
     'properties.group.id'           = 'derived_ohlcv_1m_tumbling',
     'scan.startup.mode'             = 'latest-offset',
-    'format'                        = 'avro-confluent',
-    'avro-confluent.url'            = 'http://schema-registry:8081',
-    'sink.partitioner'              = 'com.crypto.SymbolPartitioner'
+    'value.avro-confluent.url'      = 'http://schema-registry:8081',
+    'sink.partitioner'              = 'com.crypto.SymbolPartitioner',
+    'key.format'                    = 'raw',
+    'key.fields'                    = 'coin_symbol',
+    'value.format'                  = 'avro-confluent',
+    'value.fields-include'          = 'EXCEPT_KEY'
 );
 
 CREATE TABLE derived_ohlcv_5m_sliding(
@@ -83,7 +89,10 @@ WITH (
     'properties.bootstrap.servers'  = 'kafka:9092',
     'properties.group.id'           = 'derived_ohlcv_1m_tumbling',
     'scan.startup.mode'             = 'latest-offset',
-    'format'                        = 'avro-confluent',
-    'avro-confluent.url'            = 'http://schema-registry:8081',
-    'sink.partitioner'              = 'com.crypto.SymbolPartitioner'
+    'value.avro-confluent.url'      = 'http://schema-registry:8081',
+    'sink.partitioner'              = 'com.crypto.SymbolPartitioner',
+    'key.format'                    = 'raw',
+    'key.fields'                    = 'coin_symbol',
+    'value.format'                  = 'avro-confluent',
+    'value.fields-include'          = 'EXCEPT_KEY'
 );
