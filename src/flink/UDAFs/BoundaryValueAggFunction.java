@@ -15,6 +15,10 @@ public abstract class BoundaryValueAggFunction extends AggregateFunction<Double,
         public long boundaryTimestamp;  
         public boolean hasValue = false;
 
+        // Flink needs this default constructor for UDAFs:
+        public Accumulator() {}
+
+        // the constructor we actually use:
         public Accumulator(long initialTimestamp) {
             this.boundaryTimestamp = initialTimestamp;
         }

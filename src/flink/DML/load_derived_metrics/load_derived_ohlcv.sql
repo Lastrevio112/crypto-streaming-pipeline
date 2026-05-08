@@ -13,36 +13,36 @@ SELECT
     coin_symbol,
     window_start,
     window_end,
-    FIRST_VALUE_TS(price, trade_time)               AS open_price,     
-    MAX(price)                                      AS high_price,
-    MIN(price)                                      AS low_price,
-    LAST_VALUE_TS(price, trade_time)                AS close_price,     
-    SUM(quantity)                                   AS volume,
-    SUM(price * quantity)                           AS quote_volume,
-    CAST(COUNT(*) AS INT)                           AS trade_count,
-    MAX(quantity)                                   AS max_single_trade_quantity,
-    SUM(price * quantity) / SUM(quantity)           AS vwap,
+    FIRST_VALUE_TS(price, UNIX_TIMESTAMP(CAST(trade_time AS STRING)))   AS open_price,     
+    MAX(price)                                                          AS high_price,
+    MIN(price)                                                          AS low_price,
+    LAST_VALUE_TS(price, UNIX_TIMESTAMP(CAST(trade_time AS STRING)))    AS close_price,     
+    SUM(quantity)                                                       AS volume,
+    SUM(price * quantity)                                               AS quote_volume,
+    CAST(COUNT(*) AS INT)                                               AS trade_count,
+    MAX(quantity)                                                       AS max_single_trade_quantity,
+    SUM(price * quantity) / SUM(quantity)                               AS vwap,
     SUM(
         CASE WHEN is_buy_or_sell = 'buy' THEN quantity
         ELSE 0 
         END
-    )                                               AS aggressive_buy_volume,
+    )                                                                   AS aggressive_buy_volume,
     SUM(
         CASE WHEN is_buy_or_sell = 'sell' THEN quantity
         ELSE 0 
         END
-    )                                               AS aggressive_sell_volume,
+    )                                                                   AS aggressive_sell_volume,
     SUM(
         CASE WHEN is_buy_or_sell = 'buy' THEN 1
         ELSE 0 
         END
-    )                                               AS aggressive_buy_trade_count,
+    )                                                                   AS aggressive_buy_trade_count,
     SUM(
         CASE WHEN is_buy_or_sell = 'sell' THEN 1
         ELSE 0 
         END
-    )                                               AS aggressive_sell_trade_count,
-    STDDEV_POP(price)                               AS price_std_dev
+    )                                                                   AS aggressive_sell_trade_count,
+    STDDEV_POP(price)                                                   AS price_std_dev
 
 FROM TUMBLE(
     DATA => TABLE unified_normalized_stream,
@@ -61,36 +61,36 @@ SELECT
     coin_symbol,
     window_start,
     window_end,
-    FIRST_VALUE_TS(price, trade_time)               AS open_price,     
-    MAX(price)                                      AS high_price,
-    MIN(price)                                      AS low_price,
-    LAST_VALUE_TS(price, trade_time)                AS close_price,       
-    SUM(quantity)                                   AS volume,
-    SUM(price * quantity)                           AS quote_volume,
-    CAST(COUNT(*) AS INT)                           AS trade_count,
-    MAX(quantity)                                   AS max_single_trade_quantity,
-    SUM(price * quantity) / SUM(quantity)           AS vwap,
+    FIRST_VALUE_TS(price, UNIX_TIMESTAMP(CAST(trade_time AS STRING)))   AS open_price,     
+    MAX(price)                                                          AS high_price,
+    MIN(price)                                                          AS low_price,
+    LAST_VALUE_TS(price, UNIX_TIMESTAMP(CAST(trade_time AS STRING)))    AS close_price,     
+    SUM(quantity)                                                       AS volume,
+    SUM(price * quantity)                                               AS quote_volume,
+    CAST(COUNT(*) AS INT)                                               AS trade_count,
+    MAX(quantity)                                                       AS max_single_trade_quantity,
+    SUM(price * quantity) / SUM(quantity)                               AS vwap,
     SUM(
         CASE WHEN is_buy_or_sell = 'buy' THEN quantity
         ELSE 0 
         END
-    )                                               AS aggressive_buy_volume,
+    )                                                                   AS aggressive_buy_volume,
     SUM(
         CASE WHEN is_buy_or_sell = 'sell' THEN quantity
         ELSE 0 
         END
-    )                                               AS aggressive_sell_volume,
+    )                                                                   AS aggressive_sell_volume,
     SUM(
         CASE WHEN is_buy_or_sell = 'buy' THEN 1
         ELSE 0 
         END
-    )                                               AS aggressive_buy_trade_count,
+    )                                                                   AS aggressive_buy_trade_count,
     SUM(
         CASE WHEN is_buy_or_sell = 'sell' THEN 1
         ELSE 0 
         END
-    )                                               AS aggressive_sell_trade_count,
-    STDDEV_POP(price)                               AS price_std_dev
+    )                                                                   AS aggressive_sell_trade_count,
+    STDDEV_POP(price)                                                   AS price_std_dev
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,
@@ -110,36 +110,36 @@ SELECT
     coin_symbol,
     window_start,
     window_end,
-    FIRST_VALUE_TS(price, trade_time)               AS open_price,     
-    MAX(price)                                      AS high_price,
-    MIN(price)                                      AS low_price,
-    LAST_VALUE_TS(price, trade_time)                AS close_price,       
-    SUM(quantity)                                   AS volume,
-    SUM(price * quantity)                           AS quote_volume,
-    CAST(COUNT(*) AS INT)                           AS trade_count,
-    MAX(quantity)                                   AS max_single_trade_quantity,
-    SUM(price * quantity) / SUM(quantity)           AS vwap,
+    FIRST_VALUE_TS(price, UNIX_TIMESTAMP(CAST(trade_time AS STRING)))   AS open_price,     
+    MAX(price)                                                          AS high_price,
+    MIN(price)                                                          AS low_price,
+    LAST_VALUE_TS(price, UNIX_TIMESTAMP(CAST(trade_time AS STRING)))    AS close_price,     
+    SUM(quantity)                                                       AS volume,
+    SUM(price * quantity)                                               AS quote_volume,
+    CAST(COUNT(*) AS INT)                                               AS trade_count,
+    MAX(quantity)                                                       AS max_single_trade_quantity,
+    SUM(price * quantity) / SUM(quantity)                               AS vwap,
     SUM(
         CASE WHEN is_buy_or_sell = 'buy' THEN quantity
         ELSE 0 
         END
-    )                                               AS aggressive_buy_volume,
+    )                                                                   AS aggressive_buy_volume,
     SUM(
         CASE WHEN is_buy_or_sell = 'sell' THEN quantity
         ELSE 0 
         END
-    )                                               AS aggressive_sell_volume,
+    )                                                                   AS aggressive_sell_volume,
     SUM(
         CASE WHEN is_buy_or_sell = 'buy' THEN 1
         ELSE 0 
         END
-    )                                               AS aggressive_buy_trade_count,
+    )                                                                   AS aggressive_buy_trade_count,
     SUM(
         CASE WHEN is_buy_or_sell = 'sell' THEN 1
         ELSE 0 
         END
-    )                                               AS aggressive_sell_trade_count,
-    STDDEV_POP(price)                               AS price_std_dev
+    )                                                                   AS aggressive_sell_trade_count,
+    STDDEV_POP(price)                                                   AS price_std_dev
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,
@@ -159,36 +159,36 @@ SELECT
     coin_symbol,
     window_start,
     window_end,
-    FIRST_VALUE_TS(price, trade_time)               AS open_price,     
-    MAX(price)                                      AS high_price,
-    MIN(price)                                      AS low_price,
-    LAST_VALUE_TS(price, trade_time)                AS close_price,       
-    SUM(quantity)                                   AS volume,
-    SUM(price * quantity)                           AS quote_volume,
-    CAST(COUNT(*) AS INT)                           AS trade_count,
-    MAX(quantity)                                   AS max_single_trade_quantity,
-    SUM(price * quantity) / SUM(quantity)           AS vwap,
+    FIRST_VALUE_TS(price, UNIX_TIMESTAMP(CAST(trade_time AS STRING)))   AS open_price,     
+    MAX(price)                                                          AS high_price,
+    MIN(price)                                                          AS low_price,
+    LAST_VALUE_TS(price, UNIX_TIMESTAMP(CAST(trade_time AS STRING)))    AS close_price,     
+    SUM(quantity)                                                       AS volume,
+    SUM(price * quantity)                                               AS quote_volume,
+    CAST(COUNT(*) AS INT)                                               AS trade_count,
+    MAX(quantity)                                                       AS max_single_trade_quantity,
+    SUM(price * quantity) / SUM(quantity)                               AS vwap,
     SUM(
         CASE WHEN is_buy_or_sell = 'buy' THEN quantity
         ELSE 0 
         END
-    )                                               AS aggressive_buy_volume,
+    )                                                                   AS aggressive_buy_volume,
     SUM(
         CASE WHEN is_buy_or_sell = 'sell' THEN quantity
         ELSE 0 
         END
-    )                                               AS aggressive_sell_volume,
+    )                                                                   AS aggressive_sell_volume,
     SUM(
         CASE WHEN is_buy_or_sell = 'buy' THEN 1
         ELSE 0 
         END
-    )                                               AS aggressive_buy_trade_count,
+    )                                                                   AS aggressive_buy_trade_count,
     SUM(
         CASE WHEN is_buy_or_sell = 'sell' THEN 1
         ELSE 0 
         END
-    )                                               AS aggressive_sell_trade_count,
-    STDDEV_POP(price)                               AS price_std_dev
+    )                                                                   AS aggressive_sell_trade_count,
+    STDDEV_POP(price)                                                   AS price_std_dev
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,
