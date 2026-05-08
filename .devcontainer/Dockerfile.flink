@@ -37,4 +37,10 @@ RUN chmod -R 777 /opt/flink/lib/*.jar
 
 COPY .devcontainer/flink-config.yaml /opt/flink/conf/config.yaml
 
+COPY src/flink/SymbolPartitioner.java /tmp/partitioner-src/com/crypto/SymbolPartitioner.java
+RUN cd /tmp/partitioner-src && \
+    javac -cp "/opt/flink/lib/*" com/crypto/SymbolPartitioner.java && \
+    jar cf /opt/flink/lib/symbol-partitioner.jar com/ && \
+    rm -rf /tmp/partitioner-src
+
 USER flink

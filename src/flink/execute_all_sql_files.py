@@ -1,10 +1,8 @@
 from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table import StreamTableEnvironment
 from pyflink.common import Configuration
-from pyflink.datastream import CheckpointConfig, CheckpointingMode, ExternalizedCheckpointRetention
+from pyflink.datastream import CheckpointingMode, ExternalizedCheckpointRetention
 import os
-import requests
-import time
 
 FLINK_REST = "http://jobmanager:8081"
 SAVEPOINT_DIR = "file:///tmp/flink-savepoints"

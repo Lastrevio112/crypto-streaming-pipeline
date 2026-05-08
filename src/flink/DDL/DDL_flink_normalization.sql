@@ -82,14 +82,16 @@ CREATE TABLE IF NOT EXISTS DS1_binance_normalized_stream (
     quantity        DECIMAL(21, 8),
     is_buy_or_sell  STRING,
     WATERMARK FOR trade_time AS trade_time - INTERVAL '0.25' SECOND
-) WITH (
+) 
+WITH (
     'connector'                     = 'kafka',
     'topic'                         = 'DS1_binance_normalized_stream',
     'properties.bootstrap.servers'  = 'kafka:9092',
     'properties.group.id'           = 'DS1_binance_normalized_stream',
     'scan.startup.mode'             = 'latest-offset',
     'format'                        = 'avro-confluent',
-    'avro-confluent.url'            = 'http://schema-registry:8081'
+    'avro-confluent.url'            = 'http://schema-registry:8081',
+    'sink.partitioner'              = 'com.crypto.SymbolPartitioner'
 );
 
 CREATE TABLE IF NOT EXISTS DS2_mexc_normalized_stream (
@@ -102,14 +104,16 @@ CREATE TABLE IF NOT EXISTS DS2_mexc_normalized_stream (
     quantity        DECIMAL(21, 8),
     is_buy_or_sell  STRING,
     WATERMARK FOR trade_time AS trade_time - INTERVAL '0.25' SECOND 
-) WITH (
+) 
+WITH (
     'connector'                     = 'kafka',
     'topic'                         = 'DS2_mexc_normalized_stream',
     'properties.bootstrap.servers'  = 'kafka:9092',
     'properties.group.id'           = 'DS2_mexc_normalized_stream',
     'scan.startup.mode'             = 'latest-offset',
     'format'                        = 'avro-confluent',
-    'avro-confluent.url'            = 'http://schema-registry:8081'
+    'avro-confluent.url'            = 'http://schema-registry:8081',
+    'sink.partitioner'              = 'com.crypto.SymbolPartitioner'
 );
 
 
@@ -126,12 +130,14 @@ CREATE TABLE IF NOT EXISTS unified_normalized_stream (
     is_buy_or_sell  STRING,
     data_source_id  INT,
     WATERMARK FOR trade_time AS trade_time - INTERVAL '0.25' SECOND
-) WITH (
+) 
+WITH (
     'connector'                     = 'kafka',
     'topic'                         = 'unified_normalized_stream',
     'properties.bootstrap.servers'  = 'kafka:9092',
     'properties.group.id'           = 'unified_normalized_stream',
     'scan.startup.mode'             = 'latest-offset',
     'format'                        = 'avro-confluent',
-    'avro-confluent.url'            = 'http://schema-registry:8081'
+    'avro-confluent.url'            = 'http://schema-registry:8081',
+    'sink.partitioner'              = 'com.crypto.SymbolPartitioner'
 );

@@ -9,7 +9,7 @@ SELECT
     CAST(p AS DECIMAL(21, 8))                               AS price,
     CAST(q AS DECIMAL(21, 8))                               AS quantity,
     CASE
-        WHEN TRUE THEN 'sell'
+        WHEN m = TRUE THEN 'sell'
         ELSE 'buy'
     END                                                     AS is_buy_or_sell
 FROM binance_ds1_trades;

@@ -24,7 +24,8 @@ WITH (
     'properties.group.id'           = 'derived_ohlcv_1m_tumbling',
     'scan.startup.mode'             = 'latest-offset',
     'format'                        = 'avro-confluent',
-    'avro-confluent.url'            = 'http://schema-registry:8081'
+    'avro-confluent.url'            = 'http://schema-registry:8081',
+    'sink.partitioner'              = 'com.crypto.SymbolPartitioner'
 );
 
 CREATE TABLE derived_ohlcv_5m_tumbling(
@@ -53,7 +54,8 @@ WITH (
     'properties.group.id'           = 'derived_ohlcv_1m_tumbling',
     'scan.startup.mode'             = 'latest-offset',
     'format'                        = 'avro-confluent',
-    'avro-confluent.url'            = 'http://schema-registry:8081'
+    'avro-confluent.url'            = 'http://schema-registry:8081',
+    'sink.partitioner'              = 'com.crypto.SymbolPartitioner'
 );
 
 CREATE TABLE derived_ohlcv_5m_sliding(
@@ -82,5 +84,6 @@ WITH (
     'properties.group.id'           = 'derived_ohlcv_1m_tumbling',
     'scan.startup.mode'             = 'latest-offset',
     'format'                        = 'avro-confluent',
-    'avro-confluent.url'            = 'http://schema-registry:8081'
+    'avro-confluent.url'            = 'http://schema-registry:8081',
+    'sink.partitioner'              = 'com.crypto.SymbolPartitioner'
 );
