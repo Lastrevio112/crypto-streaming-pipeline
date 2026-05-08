@@ -29,7 +29,7 @@ CHECKPOINTING_INTERVAL_MS = 1000
 CHECKPOINTING_TIMEOUT_MS = 60000 # checkpoints have to complete within one minute, or are discarded
 
 check_config = env.get_checkpoint_config()
-check_config.set_checkpointing_mode(CheckpointingMode.EXACTLY_ONCE)
+check_config.set_checkpointing_mode(CheckpointingMode.AT_LEAST_ONCE)    # The only time data would be re-processed is on container rebuilds or crashes, and less than one second of data. This is acceptable.
 check_config.set_checkpoint_interval(CHECKPOINTING_INTERVAL_MS)
 check_config.set_checkpoint_timeout(CHECKPOINTING_TIMEOUT_MS)
 check_config.set_max_concurrent_checkpoints(1)
