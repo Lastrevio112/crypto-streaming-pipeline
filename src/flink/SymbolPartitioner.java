@@ -29,10 +29,12 @@ public class SymbolPartitioner implements KafkaPartitioner<Object>  {
             symbol = "";
         }
 
+        //If it's one of the five cryptocurrencies, return the key of the dictionary:
         if (PARTITION_MAP.containsKey(symbol)) {
             return PARTITION_MAP.get(symbol);
         }
 
+        //else, hash it between the remaining five partitions:
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] hashBytes = md.digest(symbol.getBytes("UTF-8"));
@@ -41,6 +43,7 @@ public class SymbolPartitioner implements KafkaPartitioner<Object>  {
             int fallbackRange = partitions.length - FALLBACK_START;
             return FALLBACK_START + hashInt.mod(BigInteger.valueOf(fallbackRange)).intValue();
         } catch (Exception e) {
+            System.out.println("Exception when trying to partition symbol " + symbol + ": " + e);
             return partitions[0];
         }
     }
