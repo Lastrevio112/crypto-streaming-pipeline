@@ -68,7 +68,8 @@ list_of_paths = [
     ('DML/load_normalization/load_DS2_mexc_normalized_stream.sql', True),
     ('DML/load_normalization/load_unified_normalized_stream.sql', True),
 
-    ('DDL/derived_metrics/DDL_flink_OHLCV.sql', False)
+    ('DDL/derived_metrics/DDL_flink_OHLCV.sql', False),
+    ('DML/load_derived_metrics/load_derived_ohlcv.sql', True)
 ]
 
 # In this loop, DDL statements will be executed while DML statements will be added to the statement set
