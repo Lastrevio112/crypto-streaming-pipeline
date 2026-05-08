@@ -37,6 +37,20 @@ check_config.set_externalized_checkpoint_retention(ExternalizedCheckpointRetenti
 
 t_env = StreamTableEnvironment.create(env)
 
+# Add the Java UDAFs to the table environment:
+t_env.get_config().set(
+    "pipeline.jars",
+    "file:///opt/flink/lib/udafs.jar;file:///opt/flink/lib/symbol-partitioner.jar"
+)
+
+t_env.create_java_function(
+    "FIRST_VALUE_TS",
+    "com.crypto.udaf.FirstValueAggFunction"
+)
+t_env.create_java_function(
+    "LAST_VALUE_TS",
+    "com.crypto.udaf.LastValueAggFunction"
+)
 
 # I wrote this function so I can add the file name without the full absolute path when calling the other function
 def computeAbsPath(path: str) -> str:

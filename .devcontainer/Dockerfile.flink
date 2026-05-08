@@ -40,10 +40,23 @@ COPY .devcontainer/flink-config.yaml /opt/flink/conf/config.yaml
 
 RUN chmod 777 /opt/flink/conf/config.yaml
 
-COPY src/flink/SymbolPartitioner.java /tmp/partitioner-src/com/crypto/SymbolPartitioner.java
+# Copy Java files in order to compile them as jars.
+COPY src/flink/partitioners/SymbolPartitioner.java /tmp/partitioner-src/com/crypto/partitioners/SymbolPartitioner.java
+COPY src/flink/UDAFs/BoundaryValueAggFunction.java /tmp/udaf-src/com/crypto/udaf/BoundaryValueAggFunction.java
+COPY src/flink/UDAFs/FirstValueAggFunction.java /tmp/udaf-src/com/crypto/udaf/FirstValueAggFunction.java
+COPY src/flink/UDAFs/LastValueAggFunction.java /tmp/udaf-src/com/crypto/udaf/LastValueAggFunction.java
+
 RUN cd /tmp/partitioner-src && \
-    javac -cp "/opt/flink/lib/*" com/crypto/SymbolPartitioner.java && \
+    javac -cp "/opt/flink/lib/*" com/crypto/partitioners/SymbolPartitioner.java && \
     jar cf /opt/flink/lib/symbol-partitioner.jar com/ && \
     rm -rf /tmp/partitioner-src
+
+RUN cd /tmp/udaf-src && \
+    javac -cp "/opt/flink/lib/*" \
+        com/crypto/udaf/BoundaryValueAggFunction.java \
+        com/crypto/udaf/FirstValueAggFunction.java \
+        com/crypto/udaf/LastValueAggFunction.java && \
+    jar cf /opt/flink/lib/udafs.jar com/ && \
+    rm -rf /tmp/udaf-src
 
 USER flink

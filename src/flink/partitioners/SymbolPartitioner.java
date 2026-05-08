@@ -1,7 +1,7 @@
 // We need the Kafka topics that act as Flink's sinks to be partitioned in the same way that the two sources are partitioned by custom_partitioner.py.
 // Since Flink SQL cannot accept Python UDFs in the PARTITIONED BY clause of DDL statements, we had to do this in Java.
 
-package com.crypto;
+package com.crypto.partitioners;
 
 import org.apache.flink.connector.kafka.sink.KafkaPartitioner;
 import java.security.MessageDigest;
