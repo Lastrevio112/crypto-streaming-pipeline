@@ -1,9 +1,5 @@
 --The per-column computation is the same for all the windowed tables so I am adding it all to one file.
 
---NOTE: FIRST_VALUE and LAST_VALUE are unpredictable without an ORDER BY clause since they are computed based on processing time, not based on event time (trade time). 
---This is fine since the watermark is large enough, but if events arrive later than the watermark interval, it can cause slight issues. 
---The alternatives would involve workarounds that have performance downsides (as well as being almost unreadable).
-
 INSERT INTO derived_ohlcv_1s_tumbling(
     coin_symbol, window_start, window_end, open_price, high_price, low_price, close_price, volume, 
     quote_volume, trade_count, max_single_trade_quantity, vwap, aggressive_buy_volume, aggressive_sell_volume, 
