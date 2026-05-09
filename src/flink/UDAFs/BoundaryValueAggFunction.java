@@ -6,8 +6,8 @@ import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.catalog.DataTypeFactory;
 import org.apache.flink.table.functions.AggregateFunction;
 import org.apache.flink.table.types.DataType;
-import org.apache.flink.table.types.inference.TypeInference;
-import org.apache.flink.table.types.inference.TypeStrategies;
+import org.apache.flink.table.annotation.DataTypeHint;
+import org.apache.flink.table.annotation.FunctionHint;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -17,6 +17,14 @@ import java.math.BigDecimal;
 
 // A parent class that the children should inherit from. It defines merge and accumulate behavior, 
 // while the child classes just define how we compare two rows.
+@FunctionHint(
+    accumulator = @DataTypeHint(value = "RAW", bridgedTo = Accumulator.class),
+    input = {
+        @DataTypeHint("DECIMAL(21, 8)"),
+        @DataTypeHint("TIMESTAMP(3)")
+    },
+    output = @DataTypeHint("DECIMAL(21, 8)")
+)
 public abstract class BoundaryValueAggFunction extends AggregateFunction<BigDecimal, Accumulator> {
     // Subclasses define whether "better" means earlier or later
     protected abstract boolean isBetterTimestamp(long candidate, long current);
@@ -60,19 +68,6 @@ public abstract class BoundaryValueAggFunction extends AggregateFunction<BigDeci
     @Override
     public BigDecimal getValue(Accumulator acc) {
         return acc.hasValue ? acc.value : null;
-    }
-
-    @Override
-    public TypeInference getTypeInference(DataTypeFactory typeFactory) {
-        return TypeInference.newBuilder()
-                .typedArguments(
-                        DataTypes.DECIMAL(21, 8).bridgedTo(BigDecimal.class),
-                        DataTypes.TIMESTAMP(3).bridgedTo(LocalDateTime.class)
-                )
-                .outputTypeStrategy(
-                    TypeStrategies.explicit(DataTypes.DECIMAL(21, 8))
-                    )
-                .build();
     }
 
 }
