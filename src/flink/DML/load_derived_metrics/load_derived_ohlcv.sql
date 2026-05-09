@@ -9,10 +9,10 @@ SELECT
     coin_symbol,
     window_start,
     window_end,
-    FIRST_VALUE_TS(price, UNIX_TIMESTAMP(TRY_CAST(trade_time AS STRING)))   AS open_price,     
+    FIRST_VALUE_TS(price, trade_time)                                       AS open_price,     
     MAX(price)                                                              AS high_price,
     MIN(price)                                                              AS low_price,
-    LAST_VALUE_TS(price, UNIX_TIMESTAMP(TRY_CAST(trade_time AS STRING)))    AS close_price,     
+    LAST_VALUE_TS(price, trade_time)                                        AS close_price,     
     SUM(quantity)                                                           AS volume,
     SUM(price * quantity)                                                   AS quote_volume,
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
@@ -38,7 +38,7 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    STDDEV_POP(price)                                                       AS price_std_dev
+    COALESCE(CAST(STDDEV_POP(price) AS DECIMAL(21,8)), -1)                  AS price_std_dev
 
 FROM TUMBLE(
     DATA => TABLE unified_normalized_stream,
@@ -57,10 +57,10 @@ SELECT
     coin_symbol,
     window_start,
     window_end,
-    FIRST_VALUE_TS(price, UNIX_TIMESTAMP(TRY_CAST(trade_time AS STRING)))   AS open_price,     
+    FIRST_VALUE_TS(price, trade_time)                             AS open_price,     
     MAX(price)                                                              AS high_price,
     MIN(price)                                                              AS low_price,
-    LAST_VALUE_TS(price, UNIX_TIMESTAMP(TRY_CAST(trade_time AS STRING)))    AS close_price,     
+    LAST_VALUE_TS(price, trade_time)                                        AS close_price,     
     SUM(quantity)                                                           AS volume,
     SUM(price * quantity)                                                   AS quote_volume,
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
@@ -86,7 +86,7 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    STDDEV_POP(price)                                                       AS price_std_dev
+    COALESCE(CAST(STDDEV_POP(price) AS DECIMAL(21,8)), -1)                  AS price_std_dev
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,
@@ -106,10 +106,10 @@ SELECT
     coin_symbol,
     window_start,
     window_end,
-    FIRST_VALUE_TS(price, UNIX_TIMESTAMP(TRY_CAST(trade_time AS STRING)))   AS open_price,     
+    FIRST_VALUE_TS(price, trade_time)                             AS open_price,     
     MAX(price)                                                              AS high_price,
     MIN(price)                                                              AS low_price,
-    LAST_VALUE_TS(price, UNIX_TIMESTAMP(TRY_CAST(trade_time AS STRING)))    AS close_price,     
+    LAST_VALUE_TS(price, trade_time)                              AS close_price,     
     SUM(quantity)                                                           AS volume,
     SUM(price * quantity)                                                   AS quote_volume,
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
@@ -135,7 +135,7 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    STDDEV_POP(price)                                                       AS price_std_dev
+    COALESCE(CAST(STDDEV_POP(price) AS DECIMAL(21,8)), -1)                  AS price_std_dev
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,
@@ -155,10 +155,10 @@ SELECT
     coin_symbol,
     window_start,
     window_end,
-    FIRST_VALUE_TS(price, UNIX_TIMESTAMP(TRY_CAST(trade_time AS STRING)))   AS open_price,     
+    FIRST_VALUE_TS(price, trade_time)                             AS open_price,     
     MAX(price)                                                              AS high_price,
     MIN(price)                                                              AS low_price,
-    LAST_VALUE_TS(price, UNIX_TIMESTAMP(TRY_CAST(trade_time AS STRING)))    AS close_price,     
+    LAST_VALUE_TS(price, trade_time)                              AS close_price,     
     SUM(quantity)                                                           AS volume,
     SUM(price * quantity)                                                   AS quote_volume,
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
@@ -184,7 +184,7 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    STDDEV_POP(price)                                                       AS price_std_dev
+    COALESCE(CAST(STDDEV_POP(price) AS DECIMAL(21,8)), -1)                  AS price_std_dev
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,

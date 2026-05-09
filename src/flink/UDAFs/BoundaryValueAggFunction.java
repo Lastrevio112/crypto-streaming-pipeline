@@ -3,6 +3,7 @@ package com.crypto.udaf;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.table.functions.AggregateFunction;
+import java.sql.Timestamp;
 
 
 // A parent class that the children should inherit from. It defines merge and accumulate behavior, 
@@ -33,11 +34,13 @@ public abstract class BoundaryValueAggFunction extends AggregateFunction<Double,
         return new Accumulator(initialTimestamp());
     }
 
-    public void accumulate(Accumulator acc, Double value, Long timestamp) {
+    // java.sql.Timestamp is the compatible-equivalent of TIMESTAMP(3) in Flink SQL - Essentially this is what we're passing to the UDAF.
+    public void accumulate(Accumulator acc, Double value, Timestamp timestamp) {
         if (value == null || timestamp == null) return;             //making this null-safe
-        if (isBetterTimestamp(timestamp, acc.boundaryTimestamp)) {
+        long timestamp_ms = timestamp.getTime();   // gives miliseconds since epoch
+        if (isBetterTimestamp(timestamp_ms, acc.boundaryTimestamp)) {
             acc.value = value;
-            acc.boundaryTimestamp = timestamp;
+            acc.boundaryTimestamp = timestamp_ms;
             acc.hasValue = true;
         }
     }
@@ -54,19 +57,21 @@ public abstract class BoundaryValueAggFunction extends AggregateFunction<Double,
         }
     }
 
-    public void retract(Accumulator acc, Double value, Long timestamp) {
-        throw new UnsupportedOperationException(this.getClass().getSimpleName() + " does not support retraction.");
+    public void retract(Accumulator acc, Double value, Timestamp timestamp) {
+        acc.hasValue = false;
+        acc.boundaryTimestamp = initialTimestamp();
+        acc.value = null;
     }
 
     // Here we define what the function actually returns.
     @Override
     public Double getValue(Accumulator acc) {
-        return acc.value;
+        return acc.hasValue ? acc.value : null;
     }
 
     @Override
     public TypeInformation<Double> getResultType() {
-        return Types.DOUBLE;
+        return TypeInformation.of(Double.class); //this is null safe compared to Types.DOUBLE, in case all prices within a window are NULL
     }
 
 }

@@ -5,10 +5,12 @@ SELECT
     trade_id, trade_time, sent_time, coin_symbol, price, quantity, is_buy_or_sell,
     1 AS data_source_id
 FROM DS1_binance_normalized_stream
-WHERE trade_time IS NOT NULL
+WHERE trade_time IS NOT NULL AND price is NOT NULL
+
 UNION ALL
+
 SELECT 
     trade_id, trade_time, sent_time, coin_symbol, price, quantity, is_buy_or_sell,
     2 AS data_source_id
 FROM DS2_mexc_normalized_stream
-WHERE trade_time IS NOT NULL;
+WHERE trade_time IS NOT NULL AND price is NOT NULL;
