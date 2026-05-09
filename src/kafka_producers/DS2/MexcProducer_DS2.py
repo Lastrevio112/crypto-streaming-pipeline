@@ -74,6 +74,17 @@ class MexcProducer_DS2(WebSocketProducer):
             }
         }
 
+        # Filter corrupt data to not push it downstream.
+        if (
+            data["symbol"] is None
+            or any(
+                deal["price"] is None or deal["time"] is None
+                for deal in data["publicdeals"]["dealsList"]
+            )
+        ):
+            return
+
+
         serialized = self.avro_serializer(
             data,
             SerializationContext(self.topic, MessageField.VALUE)

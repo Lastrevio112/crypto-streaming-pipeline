@@ -39,6 +39,12 @@ class BinanceProducer_DS1(WebSocketProducer):
             print("serverShutdown received, closing connection for reconnect...")
             ws.close()
             return
+        
+        # If data is corrupt, don't send it downstream. Certain fields are mandatory.
+        if any(data[x] is None for x in ("T", "s", "t", "p")):
+            return
+        if data["p"] == 0 or data["p"] == "0":
+            return
 
         symbol = data.get("s")  # we get the cryptocurrency here, which is also the partition key
         partition = custom_partitioner(symbol, num_partitions=int(os.getenv("NUM_PARTITIONS")))
