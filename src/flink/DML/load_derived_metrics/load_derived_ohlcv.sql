@@ -13,24 +13,14 @@ SELECT
     MAX(price)                                                              AS high_price,
     MIN(price)                                                              AS low_price,
     LAST_VALUE_TS(price, trade_time)                                        AS close_price,     
-    COALESCE(SUM(quantity), 0.0)                                            AS volume,
-    SUM(price * COALESCE(quantity, 0.0))                                    AS quote_volume,
+    SUM(quantity)                                                           AS volume,
+    SUM(price * quantity)                                                   AS quote_volume,
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
-    MAX(COALESCE(quantity, 0.0))                                            AS max_single_trade_quantity,
-    COALESCE(
-        SUM(price * quantity) / COALESCE(SUM(quantity), 1),
-        0.0
-        )                                                                   AS vwap,
-    SUM(
-        CASE WHEN is_buy_or_sell = 'buy' THEN quantity
-        ELSE 0 
-        END
-    )                                                                       AS aggressive_buy_volume,
-    SUM(
-        CASE WHEN is_buy_or_sell = 'sell' THEN quantity
-        ELSE 0 
-        END
-    )                                                                       AS aggressive_sell_volume,
+    MAX(quantity)                                                           AS max_single_trade_quantity,
+    SUM(price * quantity) / 
+    IF(SUM(quantity) = 0, CAST(1.0 AS DECIMAL(21,8)), SUM(quantity))        AS vwap,
+    SUM(CASE WHEN is_buy_or_sell = 'buy' THEN quantity END)                 AS aggressive_buy_volume,
+    SUM(CASE WHEN is_buy_or_sell = 'sell' THEN quantity END)                AS aggressive_sell_volume,
     SUM(
         CASE WHEN is_buy_or_sell = 'buy' THEN 1
         ELSE 0 
@@ -41,10 +31,10 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    CASE
-        WHEN STDDEV_POP(price) <> STDDEV_POP(price) THEN -1.0  --Nan=NaN is false
-        ELSE COALESCE(STDDEV_POP(price), -1.0)
-    END                                                                     AS price_std_dev
+    COALESCE(
+        TRY_CAST(STDDEV_POP(price) AS DECIMAL(21, 8)),
+        CAST(-1.0 AS DECIMAL(21, 8))    -- -1.0 records are corrupt and will be filtered later by Clickhouse
+    )                                                                       AS price_std_dev
 
 FROM TUMBLE(
     DATA => TABLE unified_normalized_stream,
@@ -68,24 +58,14 @@ SELECT
     MAX(price)                                                              AS high_price,
     MIN(price)                                                              AS low_price,
     LAST_VALUE_TS(price, trade_time)                                        AS close_price,     
-    COALESCE(SUM(quantity), 0.0)                                            AS volume,
-    SUM(price * COALESCE(quantity, 0.0))                                    AS quote_volume,
+    SUM(quantity)                                                           AS volume,
+    SUM(price * quantity)                                                   AS quote_volume,
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
-    MAX(COALESCE(quantity, 0.0))                                            AS max_single_trade_quantity,
-    COALESCE(
-        SUM(price * quantity) / COALESCE(SUM(quantity), 1),
-        0.0
-        )                                                                   AS vwap,
-    SUM(
-        CASE WHEN is_buy_or_sell = 'buy' THEN quantity
-        ELSE 0 
-        END
-    )                                                                       AS aggressive_buy_volume,
-    SUM(
-        CASE WHEN is_buy_or_sell = 'sell' THEN quantity
-        ELSE 0 
-        END
-    )                                                                       AS aggressive_sell_volume,
+    MAX(quantity)                                                           AS max_single_trade_quantity,
+    SUM(price * quantity) / 
+    IF(SUM(quantity) = 0, CAST(1.0 AS DECIMAL(21,8)), SUM(quantity))        AS vwap,
+    SUM(CASE WHEN is_buy_or_sell = 'buy' THEN quantity END)                 AS aggressive_buy_volume,
+    SUM(CASE WHEN is_buy_or_sell = 'sell' THEN quantity END)                AS aggressive_sell_volume,
     SUM(
         CASE WHEN is_buy_or_sell = 'buy' THEN 1
         ELSE 0 
@@ -96,10 +76,10 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    CASE
-        WHEN STDDEV_POP(price) <> STDDEV_POP(price) THEN -1.0  --Nan=NaN is false
-        ELSE COALESCE(STDDEV_POP(price), -1.0)
-    END                                                                     AS price_std_dev
+    COALESCE(
+        TRY_CAST(STDDEV_POP(price) AS DECIMAL(21, 8)),
+        CAST(-1.0 AS DECIMAL(21, 8))    -- -1.0 records are corrupt and will be filtered later by Clickhouse
+    )                                                                       AS price_std_dev
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,
@@ -124,24 +104,14 @@ SELECT
     MAX(price)                                                              AS high_price,
     MIN(price)                                                              AS low_price,
     LAST_VALUE_TS(price, trade_time)                                        AS close_price,     
-    COALESCE(SUM(quantity), 0.0)                                            AS volume,
-    SUM(price * COALESCE(quantity, 0.0))                                    AS quote_volume,
+    SUM(quantity)                                                           AS volume,
+    SUM(price * quantity)                                                   AS quote_volume,
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
-    MAX(COALESCE(quantity, 0.0))                                            AS max_single_trade_quantity,
-    COALESCE(
-        SUM(price * quantity) / COALESCE(SUM(quantity), 1),
-        0.0
-        )                                                                   AS vwap,
-    SUM(
-        CASE WHEN is_buy_or_sell = 'buy' THEN quantity
-        ELSE 0 
-        END
-    )                                                                       AS aggressive_buy_volume,
-    SUM(
-        CASE WHEN is_buy_or_sell = 'sell' THEN quantity
-        ELSE 0 
-        END
-    )                                                                       AS aggressive_sell_volume,
+    MAX(quantity)                                                           AS max_single_trade_quantity,
+    SUM(price * quantity) / 
+    IF(SUM(quantity) = 0, CAST(1.0 AS DECIMAL(21,8)), SUM(quantity))        AS vwap,
+    SUM(CASE WHEN is_buy_or_sell = 'buy' THEN quantity END)                 AS aggressive_buy_volume,
+    SUM(CASE WHEN is_buy_or_sell = 'sell' THEN quantity END)                AS aggressive_sell_volume,
     SUM(
         CASE WHEN is_buy_or_sell = 'buy' THEN 1
         ELSE 0 
@@ -152,10 +122,10 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    CASE
-        WHEN STDDEV_POP(price) <> STDDEV_POP(price) THEN -1.0  --Nan=NaN is false
-        ELSE COALESCE(STDDEV_POP(price), -1.0)
-    END                                                                     AS price_std_dev
+    COALESCE(
+        TRY_CAST(STDDEV_POP(price) AS DECIMAL(21, 8)),
+        CAST(-1.0 AS DECIMAL(21, 8))    -- -1.0 records are corrupt and will be filtered later by Clickhouse
+    )                                                                       AS price_std_dev
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,
@@ -180,24 +150,14 @@ SELECT
     MAX(price)                                                              AS high_price,
     MIN(price)                                                              AS low_price,
     LAST_VALUE_TS(price, trade_time)                                        AS close_price,     
-    COALESCE(SUM(quantity), 0.0)                                            AS volume,
-    SUM(price * COALESCE(quantity, 0.0))                                    AS quote_volume,
+    SUM(quantity)                                                           AS volume,
+    SUM(price * quantity)                                                   AS quote_volume,
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
-    MAX(COALESCE(quantity, 0.0))                                            AS max_single_trade_quantity,
-    COALESCE(
-        SUM(price * quantity) / COALESCE(SUM(quantity), 1),
-        0.0
-        )                                                                   AS vwap,
-    SUM(
-        CASE WHEN is_buy_or_sell = 'buy' THEN quantity
-        ELSE 0 
-        END
-    )                                                                       AS aggressive_buy_volume,
-    SUM(
-        CASE WHEN is_buy_or_sell = 'sell' THEN quantity
-        ELSE 0 
-        END
-    )                                                                       AS aggressive_sell_volume,
+    MAX(quantity)                                                           AS max_single_trade_quantity,
+    SUM(price * quantity) / 
+    IF(SUM(quantity) = 0, CAST(1.0 AS DECIMAL(21,8)), SUM(quantity))        AS vwap,
+    SUM(CASE WHEN is_buy_or_sell = 'buy' THEN quantity END)                 AS aggressive_buy_volume,
+    SUM(CASE WHEN is_buy_or_sell = 'sell' THEN quantity END)                AS aggressive_sell_volume,
     SUM(
         CASE WHEN is_buy_or_sell = 'buy' THEN 1
         ELSE 0 
@@ -208,10 +168,10 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    CASE
-        WHEN STDDEV_POP(price) <> STDDEV_POP(price) THEN -1.0  --Nan=NaN is false
-        ELSE COALESCE(STDDEV_POP(price), -1.0)
-    END                                                                     AS price_std_dev
+    COALESCE(
+        TRY_CAST(STDDEV_POP(price) AS DECIMAL(21, 8)),
+        CAST(-1.0 AS DECIMAL(21, 8))    -- -1.0 records are corrupt and will be filtered later by Clickhouse
+    )                                                                       AS price_std_dev
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,
