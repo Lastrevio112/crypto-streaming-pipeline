@@ -13,11 +13,14 @@ SELECT
     MAX(price)                                                              AS high_price,
     MIN(price)                                                              AS low_price,
     LAST_VALUE_TS(price, trade_time)                                        AS close_price,     
-    SUM(quantity)                                                           AS volume,
-    SUM(price * quantity)                                                   AS quote_volume,
+    COALESCE(SUM(quantity), 0.0)                                            AS volume,
+    SUM(price * COALESCE(quantity, 0.0))                                    AS quote_volume,
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
-    MAX(quantity)                                                           AS max_single_trade_quantity,
-    SUM(price * quantity) / SUM(quantity)                                   AS vwap,
+    MAX(COALESCE(quantity, 0.0))                                            AS max_single_trade_quantity,
+    COALESCE(
+        SUM(price * quantity) / COALESCE(SUM(quantity), 1),
+        0.0
+        )                                                                   AS vwap,
     SUM(
         CASE WHEN is_buy_or_sell = 'buy' THEN quantity
         ELSE 0 
@@ -38,7 +41,10 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    COALESCE(CAST(STDDEV_POP(price) AS DECIMAL(21,8)), -1)                  AS price_std_dev
+    CASE
+        WHEN STDDEV_POP(price) <> STDDEV_POP(price) THEN -1.0  --Nan=NaN is false
+        ELSE COALESCE(STDDEV_POP(price), -1.0)
+    END                                                                     AS price_std_dev
 
 FROM TUMBLE(
     DATA => TABLE unified_normalized_stream,
@@ -57,15 +63,18 @@ SELECT
     coin_symbol,
     window_start,
     window_end,
-    FIRST_VALUE_TS(price, trade_time)                             AS open_price,     
+    FIRST_VALUE_TS(price, trade_time)                                       AS open_price,     
     MAX(price)                                                              AS high_price,
     MIN(price)                                                              AS low_price,
     LAST_VALUE_TS(price, trade_time)                                        AS close_price,     
-    SUM(quantity)                                                           AS volume,
-    SUM(price * quantity)                                                   AS quote_volume,
+    COALESCE(SUM(quantity), 0.0)                                            AS volume,
+    SUM(price * COALESCE(quantity, 0.0))                                    AS quote_volume,
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
-    MAX(quantity)                                                           AS max_single_trade_quantity,
-    SUM(price * quantity) / SUM(quantity)                                   AS vwap,
+    MAX(COALESCE(quantity, 0.0))                                            AS max_single_trade_quantity,
+    COALESCE(
+        SUM(price * quantity) / COALESCE(SUM(quantity), 1),
+        0.0
+        )                                                                   AS vwap,
     SUM(
         CASE WHEN is_buy_or_sell = 'buy' THEN quantity
         ELSE 0 
@@ -86,7 +95,10 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    COALESCE(CAST(STDDEV_POP(price) AS DECIMAL(21,8)), -1)                  AS price_std_dev
+    CASE
+        WHEN STDDEV_POP(price) <> STDDEV_POP(price) THEN -1.0  --Nan=NaN is false
+        ELSE COALESCE(STDDEV_POP(price), -1.0)
+    END                                                                     AS price_std_dev
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,
@@ -106,15 +118,18 @@ SELECT
     coin_symbol,
     window_start,
     window_end,
-    FIRST_VALUE_TS(price, trade_time)                             AS open_price,     
+    FIRST_VALUE_TS(price, trade_time)                                       AS open_price,     
     MAX(price)                                                              AS high_price,
     MIN(price)                                                              AS low_price,
-    LAST_VALUE_TS(price, trade_time)                              AS close_price,     
-    SUM(quantity)                                                           AS volume,
-    SUM(price * quantity)                                                   AS quote_volume,
+    LAST_VALUE_TS(price, trade_time)                                        AS close_price,     
+    COALESCE(SUM(quantity), 0.0)                                            AS volume,
+    SUM(price * COALESCE(quantity, 0.0))                                    AS quote_volume,
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
-    MAX(quantity)                                                           AS max_single_trade_quantity,
-    SUM(price * quantity) / SUM(quantity)                                   AS vwap,
+    MAX(COALESCE(quantity, 0.0))                                            AS max_single_trade_quantity,
+    COALESCE(
+        SUM(price * quantity) / COALESCE(SUM(quantity), 1),
+        0.0
+        )                                                                   AS vwap,
     SUM(
         CASE WHEN is_buy_or_sell = 'buy' THEN quantity
         ELSE 0 
@@ -135,7 +150,10 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    COALESCE(CAST(STDDEV_POP(price) AS DECIMAL(21,8)), -1)                  AS price_std_dev
+    CASE
+        WHEN STDDEV_POP(price) <> STDDEV_POP(price) THEN -1.0  --Nan=NaN is false
+        ELSE COALESCE(STDDEV_POP(price), -1.0)
+    END                                                                     AS price_std_dev
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,
@@ -155,15 +173,18 @@ SELECT
     coin_symbol,
     window_start,
     window_end,
-    FIRST_VALUE_TS(price, trade_time)                             AS open_price,     
+    FIRST_VALUE_TS(price, trade_time)                                       AS open_price,     
     MAX(price)                                                              AS high_price,
     MIN(price)                                                              AS low_price,
-    LAST_VALUE_TS(price, trade_time)                              AS close_price,     
-    SUM(quantity)                                                           AS volume,
-    SUM(price * quantity)                                                   AS quote_volume,
+    LAST_VALUE_TS(price, trade_time)                                        AS close_price,     
+    COALESCE(SUM(quantity), 0.0)                                            AS volume,
+    SUM(price * COALESCE(quantity, 0.0))                                    AS quote_volume,
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
-    MAX(quantity)                                                           AS max_single_trade_quantity,
-    SUM(price * quantity) / SUM(quantity)                                   AS vwap,
+    MAX(COALESCE(quantity, 0.0))                                            AS max_single_trade_quantity,
+    COALESCE(
+        SUM(price * quantity) / COALESCE(SUM(quantity), 1),
+        0.0
+        )                                                                   AS vwap,
     SUM(
         CASE WHEN is_buy_or_sell = 'buy' THEN quantity
         ELSE 0 
@@ -184,7 +205,10 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    COALESCE(CAST(STDDEV_POP(price) AS DECIMAL(21,8)), -1)                  AS price_std_dev
+    CASE
+        WHEN STDDEV_POP(price) <> STDDEV_POP(price) THEN -1.0  --Nan=NaN is false
+        ELSE COALESCE(STDDEV_POP(price), -1.0)
+    END                                                                     AS price_std_dev
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,

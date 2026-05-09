@@ -93,6 +93,16 @@ for path, is_DML in list_of_paths:
     # print(path, stmt_set_ref)
     execute_sql_file(t_env, file_path=computeAbsPath(path), is_DML=is_DML)
 
+# result = t_env.execute_sql("""
+# SELECT * FROM unified_normalized_stream
+# WHERE trade_time IS NULL
+# OR price IS NULL
+# OR trade_id IS NULL
+# OR coin_symbol IS NULL
+# OR CAST(trade_time AS STRING) LIKE 'N%'
+# OR CAST(price AS STRING) LIKE 'N%'
+# LIMIT 10  
+# """).print()
 
 # Execute all DML statements as a named job for future idempotency
 print(f"Launching {JOB_NAME}...")
