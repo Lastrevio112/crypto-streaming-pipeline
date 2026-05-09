@@ -2,29 +2,22 @@ package com.crypto.udaf;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeinfo.Types;
+import org.apache.flink.table.api.DataTypes;
+import org.apache.flink.table.catalog.DataTypeFactory;
 import org.apache.flink.table.functions.AggregateFunction;
-import java.sql.Timestamp;
+import org.apache.flink.table.types.DataType;
+import org.apache.flink.table.types.inference.TypeInference;
+import org.apache.flink.table.types.inference.TypeStrategies;
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
+import java.math.BigDecimal;
 
 
 // A parent class that the children should inherit from. It defines merge and accumulate behavior, 
 // while the child classes just define how we compare two rows.
-public abstract class BoundaryValueAggFunction extends AggregateFunction<Double, BoundaryValueAggFunction.Accumulator> {
-    // Accumulate defines what we are aggregating as values 'accumulate' in a sliding window. 
-    // The 'value' variable is what the function will end up passing as a parameter in SQL.
-    public static class Accumulator {
-        public Double value = null;
-        public long boundaryTimestamp;  
-        public boolean hasValue = false;
-
-        // Flink needs this default constructor for UDAFs:
-        public Accumulator() {}
-
-        // the constructor we actually use:
-        public Accumulator(long initialTimestamp) {
-            this.boundaryTimestamp = initialTimestamp;
-        }
-    }
-
+public abstract class BoundaryValueAggFunction extends AggregateFunction<BigDecimal, Accumulator> {
     // Subclasses define whether "better" means earlier or later
     protected abstract boolean isBetterTimestamp(long candidate, long current);
     protected abstract long initialTimestamp();
@@ -34,10 +27,10 @@ public abstract class BoundaryValueAggFunction extends AggregateFunction<Double,
         return new Accumulator(initialTimestamp());
     }
 
-    // java.sql.Timestamp is the compatible-equivalent of TIMESTAMP(3) in Flink SQL - Essentially this is what we're passing to the UDAF.
-    public void accumulate(Accumulator acc, Double value, Timestamp timestamp) {
+    // java.time.LocalDateTime is the compatible-equivalent of TIMESTAMP(3) in Flink SQL - Essentially this is what we're passing to the UDAF.
+    public void accumulate(Accumulator acc, BigDecimal value, LocalDateTime timestamp) {
         if (value == null || timestamp == null) return;             //making this null-safe
-        long timestamp_ms = timestamp.getTime();   // gives miliseconds since epoch
+        long timestamp_ms = timestamp.toInstant(ZoneOffset.UTC).toEpochMilli();   // gives miliseconds since epoch
         if (isBetterTimestamp(timestamp_ms, acc.boundaryTimestamp)) {
             acc.value = value;
             acc.boundaryTimestamp = timestamp_ms;
@@ -57,7 +50,7 @@ public abstract class BoundaryValueAggFunction extends AggregateFunction<Double,
         }
     }
 
-    public void retract(Accumulator acc, Double value, Timestamp timestamp) {
+    public void retract(Accumulator acc, BigDecimal value, LocalDateTime timestamp) {
         acc.hasValue = false;
         acc.boundaryTimestamp = initialTimestamp();
         acc.value = null;
@@ -65,13 +58,21 @@ public abstract class BoundaryValueAggFunction extends AggregateFunction<Double,
 
     // Here we define what the function actually returns.
     @Override
-    public Double getValue(Accumulator acc) {
+    public BigDecimal getValue(Accumulator acc) {
         return acc.hasValue ? acc.value : null;
     }
 
     @Override
-    public TypeInformation<Double> getResultType() {
-        return TypeInformation.of(Double.class); //this is null safe compared to Types.DOUBLE, in case all prices within a window are NULL
+    public TypeInference getTypeInference(DataTypeFactory typeFactory) {
+        return TypeInference.newBuilder()
+                .typedArguments(
+                        DataTypes.DECIMAL(21, 8).bridgedTo(BigDecimal.class),
+                        DataTypes.TIMESTAMP(3).bridgedTo(LocalDateTime.class)
+                )
+                .outputTypeStrategy(
+                    TypeStrategies.explicit(DataTypes.DECIMAL(21, 8))
+                    )
+                .build();
     }
 
 }

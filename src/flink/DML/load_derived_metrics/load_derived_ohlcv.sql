@@ -51,6 +51,7 @@ FROM TUMBLE(
     TIMECOL => DESCRIPTOR(trade_time),
     SIZE => INTERVAL '1' SECOND
 )
+WHERE TRY_CAST(price AS DECIMAL(21, 8)) IS NOT NULL
 GROUP BY coin_symbol, window_start, window_end;
 
 
@@ -106,6 +107,7 @@ FROM HOP(
     SLIDE => INTERVAL '1' SECOND,
     SIZE => INTERVAL '5' SECOND
 )
+WHERE TRY_CAST(price AS DECIMAL(21, 8)) IS NOT NULL
 GROUP BY coin_symbol, window_start, window_end;
 
 
@@ -161,6 +163,7 @@ FROM HOP(
     SLIDE => INTERVAL '5' SECOND,
     SIZE => INTERVAL '1' MINUTE
 )
+WHERE TRY_CAST(price AS DECIMAL(21, 8)) IS NOT NULL
 GROUP BY coin_symbol, window_start, window_end;
 
 
@@ -216,4 +219,5 @@ FROM HOP(
     SLIDE => INTERVAL '30' SECOND,
     SIZE => INTERVAL '5' MINUTE
 )
+WHERE TRY_CAST(price AS DECIMAL(21, 8)) IS NOT NULL
 GROUP BY coin_symbol, window_start, window_end;
