@@ -18,7 +18,7 @@ SELECT
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
     MAX(quantity)                                                           AS max_single_trade_quantity,
     SUM(price * quantity) / 
-    IF(SUM(quantity) = 0, CAST(1.0 AS DECIMAL(21,8)), SUM(quantity))        AS vwap,
+    SUM(price * quantity) / NULLIF(SUM(quantity), 0)                        AS vwap,
     SUM(CASE WHEN is_buy_or_sell = 'buy' THEN quantity END)                 AS aggressive_buy_volume,
     SUM(CASE WHEN is_buy_or_sell = 'sell' THEN quantity END)                AS aggressive_sell_volume,
     SUM(
@@ -42,6 +42,7 @@ FROM TUMBLE(
     SIZE => INTERVAL '1' SECOND
 )
 WHERE TRY_CAST(price AS DECIMAL(21, 8)) IS NOT NULL
+AND TRY_CAST(quantity AS DECIMAL(21,8)) IS NOT NULL
 GROUP BY coin_symbol, window_start, window_end;
 
 
@@ -63,7 +64,7 @@ SELECT
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
     MAX(quantity)                                                           AS max_single_trade_quantity,
     SUM(price * quantity) / 
-    IF(SUM(quantity) = 0, CAST(1.0 AS DECIMAL(21,8)), SUM(quantity))        AS vwap,
+    SUM(price * quantity) / NULLIF(SUM(quantity), 0)                        AS vwap,
     SUM(CASE WHEN is_buy_or_sell = 'buy' THEN quantity END)                 AS aggressive_buy_volume,
     SUM(CASE WHEN is_buy_or_sell = 'sell' THEN quantity END)                AS aggressive_sell_volume,
     SUM(
@@ -88,6 +89,7 @@ FROM HOP(
     SIZE => INTERVAL '5' SECOND
 )
 WHERE TRY_CAST(price AS DECIMAL(21, 8)) IS NOT NULL
+AND TRY_CAST(quantity AS DECIMAL(21,8)) IS NOT NULL
 GROUP BY coin_symbol, window_start, window_end;
 
 
@@ -109,7 +111,7 @@ SELECT
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
     MAX(quantity)                                                           AS max_single_trade_quantity,
     SUM(price * quantity) / 
-    IF(SUM(quantity) = 0, CAST(1.0 AS DECIMAL(21,8)), SUM(quantity))        AS vwap,
+    SUM(price * quantity) / NULLIF(SUM(quantity), 0)                        AS vwap,
     SUM(CASE WHEN is_buy_or_sell = 'buy' THEN quantity END)                 AS aggressive_buy_volume,
     SUM(CASE WHEN is_buy_or_sell = 'sell' THEN quantity END)                AS aggressive_sell_volume,
     SUM(
@@ -134,6 +136,7 @@ FROM HOP(
     SIZE => INTERVAL '1' MINUTE
 )
 WHERE TRY_CAST(price AS DECIMAL(21, 8)) IS NOT NULL
+AND TRY_CAST(quantity AS DECIMAL(21,8)) IS NOT NULL
 GROUP BY coin_symbol, window_start, window_end;
 
 
@@ -155,7 +158,7 @@ SELECT
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
     MAX(quantity)                                                           AS max_single_trade_quantity,
     SUM(price * quantity) / 
-    IF(SUM(quantity) = 0, CAST(1.0 AS DECIMAL(21,8)), SUM(quantity))        AS vwap,
+    SUM(price * quantity) / NULLIF(SUM(quantity), 0)                        AS vwap,
     SUM(CASE WHEN is_buy_or_sell = 'buy' THEN quantity END)                 AS aggressive_buy_volume,
     SUM(CASE WHEN is_buy_or_sell = 'sell' THEN quantity END)                AS aggressive_sell_volume,
     SUM(
@@ -180,4 +183,5 @@ FROM HOP(
     SIZE => INTERVAL '5' MINUTE
 )
 WHERE TRY_CAST(price AS DECIMAL(21, 8)) IS NOT NULL
+AND TRY_CAST(quantity AS DECIMAL(21,8)) IS NOT NULL
 GROUP BY coin_symbol, window_start, window_end;
