@@ -35,3 +35,44 @@ Lastly, we have one AVRO schema_registry with _forward compatibility_ to make su
 Under src/kafka_schema_registry we have a generic function to register any schema (register_schema.py) and two scripts that run it for each data source.
 
 The Kafka topics have a replication-factor of 1 - this is because I am running this on a single broker (an Oracle VM) so it would be pointless to replicate data.
+
+# FLINK DOCUMENTATION
+
+The cleaning of our data, as well as the calculation of our 'business metrics' over certain time windows (vwap, standard deviation of price, other things that might be relevant to crypto traders) was done with **Flink SQL**. At the same time, in the src/flink/ sub-folder, there is also Python and Java code. 
+
+**Folder structure**
+
+The folder structure for our Flink code is like this: 
+<img width="433" height="687" alt="image" src="https://github.com/user-attachments/assets/c32078d3-11c7-4e90-814f-ade06975b521" />
+
+-The main orchestrator script that configures and runs our entire pipeline/DAG was written in Python (PyFlink) and it lives in src/flink/execute_all_sql_files.sql.
+
+-Custom UDAFs were written in Java that re-implement standard Flink functions if they were buggy or limited in some way - these live src/flink/UDAFs.
+
+-The custom partitioner our Kafka producers use upstream was re-written in Java as well so that it can be used by the Flink SQL DDL statements - this Java class lives in src/flink/partitioners/SymbolPartitioner.java. 
+
+-_run_flink_from_checkpoint.sh_ -> this is a bash script that runs our main PyFlink orchestrator from the last checkpoint after crawling our 'checkpoints' named Docker volume. It is called on every container rebuild by docker-compose.yml.
+
+-Lastly, we have the .sql files that live in the DDL and DML sub-folders.
+
+**PyFlink orchestrator - execute_all_sql_files.py**
+
+The data flow goes like this: each time my Docker container is rebuilt, docker-compose.yml runs as usual and it calls run_flink_from_checkpoint.sh. The beforementioned bash script crawls our checkpoints named volume, finds the latest checkpoint (if there is one, otherwise it starts the script without checkpoint) and runs our PyFlink orchestrator from that checkpoint.
+
+The PyFlink orhcestrator, in turn, runs our .sql files: the DDL files are executed one by one, while the DML statements are all added to one big statement set that is executed at the end -> this is because we have only one interconnected DAG, hence the need for a single statement set. So the execution flow goes like this: docker compose -> bash script -> PyFlink -> .sql files.
+
+Checkpointing: we use at-least-once checkpointing with a checkpoint comitted once per second. This gurantees us low-latency (that we wouldn't have had with exactly once semantics) while also only getting duplicates in case of failures or container rebuilds, and even in those cases, the time frame in which we would get duplicates would never be larger than 1 second. Time out was configured as well: checkpoints have to complete within one minute, or are discarded. VERY IMPORTANTLY, checkpoints are retained on cancellation and are mounted to a named docker volume -> this makes them survive Docker container rebuilds, which I trigger very often in development.
+
+**Flink SQL**
+
+Each SQL table has a Kafka topic underneath as storage, with 10 partitions and a replication factor of 1. The tables live across three layers in the data flow: the first layer are the pure sources, two tables which simply read the raw data from the topics in which our two Kafka producers write into. The second layer consists of topics which act as both sources and sinks - this is the 'normalized' layer which cleans the data, removes unnecessary columns and casts everything to the correct data types. Lastly, we have the "derived" layer which acts only as a sink for Flink and not as a source (although it is a source for Clickhouse, downstream): this computes trading-relevant business metrics accross various time windows - 1 second tumbling, 5 second sliding with 1 second step, 1 minute sliding with 5 second step and 5 minute sliding with 30 second step.
+
+The three layers described above _roughly_ correspond to the bronze, silver and gold layers in a medallion architecture, although it's debatable how much that terminology applies to streaming - especially in my case where the supposed 'gold' layer will still be a source for Clickhouse further downstream, and Clickhouse itself will compute various materialized views with even more business metrics, so maybe Clickhouse is the actual gold layer? Idk.
+
+What is worth noting here that is very important is that the four 'derived' tables use the upsert-kafka connector and therefore could not be partitioned by a custom partitioner class - this is not a problem since it's the normalized (silver?) layer that I actually cared for to be partitioned in the same way our source Kafka topics are (with the custom partitioner). I wanted faster filtering and aggregation per cryptocurrency, which means that only the sources for the Flink tables which do aggregate by coin (that is, the derived layer) needed to be partitioned in that custom way, which is what actually ended up happening, which is good.
+
+Another thing worth noting about the derived tables: I only computed metrics that would be impossible to derive from other metrics accross a time window. This is to keep the data "normalized" to a certain extent, although I'm not sure if you can call it database normalization as that is a batch/RDBMS concept which doesn't apply to me when I don't even have a database so upstream. Nevertheless, what I implemented _kind of_ resembles the equivalent of a 3NF normalization for streams - but with measures instead of dimensions. What I intended to do is not to have a measure in my Flink tables that can be derived from other measures within the same time window. For example, I decided to not add a "net flow" column since this can be easily derived from aggressive_buy_volume - aggressive_sell_volume downstream. Therefore, all metrics which can be derived from the existing metrics will be implemented downstream by Clickhouse materialized views.
+
+A note on UDAFs: I had to re-implement in Java the FIRST_VALUE and LAST_VALUE functions, to compute the open and close price per candle. This is because the built-in Flink functions cannot be used within sliding windows that have a group by. I also had to re-implement the standard deviation function in Java because the built-in one literally had a bug that would crash my pipeline (it would try to convert 'NaN' to DECIMAL for windows with zero trades), no matter how many TRY_CASTs and COALESCEs I would add in SQL.
+
+The custom Java UDAFs were written by extending the AggregateFunction class, writing a custom Accumulator and implementing/overriding the accumulate, merge, retract and getValue methods accordingly. (For what each of those four methods do in Flink Java, please refer to the official Flink documentation [here](https://nightlies.apache.org/flink/flink-docs-stable/api/java/org/apache/flink/table/functions/AggregateFunction.html).)
