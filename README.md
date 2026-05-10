@@ -3,7 +3,28 @@ This is an in-progress streaming pipeline using Kafka, Flink, FastAPI, Javascrip
 
 # KAFKA PRODUCERS DOCUMENTATION
 
-Under src/kafka_producers there is all the source code for the producers of this pipeline writing to Kafka.
+Under src/kafka_producers there is all the source code for the producers of this pipeline writing to Kafka:
+```
+src/
+├── kafka_producers/
+│   ├── DS1/
+│   │   ├── BinanceProducer_DS1.py
+│   │   ├── run_DS1_producer.py
+│   ├── DS2/
+│   │   ├── MexcProducer_DS2.py
+│   │   ├── run_DS2_producer.py
+│   ├── __init__.py
+│   ├── custom_partitioner.py
+│   ├── run_with_reconnect.py
+│   └── WebSocketProducer.py
+├── kafka_schema_registry/
+│   ├── register_schema_DS1.py
+│   ├── register_schema_DS2.py
+│   └── register_schema.py
+├── serialized_data/
+│   └── top_50_coins.json
+└── kafka_topic_create_commands.txt
+```
 
 We have two data sources: the public Binance websocket (data source 1) and the MEXC websocket (data source 2). These websockets give real-time feeds of cryptocurrency trades happening on their platform.
 
