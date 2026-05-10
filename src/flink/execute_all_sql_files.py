@@ -37,7 +37,7 @@ check_config.set_externalized_checkpoint_retention(ExternalizedCheckpointRetenti
 
 t_env = StreamTableEnvironment.create(env)
 
-t_env.get_config().set("table.exec.sink.not-null-enforcer", "DROP") # So that Flink sub-tasks straight up crash
+t_env.get_config().set("table.exec.sink.not-null-enforcer", "DROP") # So that Flink sub-tasks don't straight up crash
 t_env.get_config().set("table.exec.legacy-cast-behaviour", "ENABLED")
 
 # Add the Java UDAFs to the table environment:
