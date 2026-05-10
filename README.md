@@ -1,6 +1,10 @@
 # Real-time Cryptocurrency Price Analysis
 This is an in-progress streaming pipeline using Kafka, Flink, FastAPI, Javascript, Clickhouse, Grafana and Docker. The goal is to create a real-time crypto charting platform.
 
+# DATA FLOW UNTIL NOW
+
+<img width="1386" height="398" alt="Data Flow" src="https://github.com/user-attachments/assets/63f337df-c2a4-45b5-9043-9bfaf98b2efe" />
+
 # KAFKA PRODUCERS DOCUMENTATION
 
 Under src/kafka_producers there is all the source code for the producers of this pipeline writing to Kafka:
