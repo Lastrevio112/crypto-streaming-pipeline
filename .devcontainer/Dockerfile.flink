@@ -42,10 +42,14 @@ RUN chmod 777 /opt/flink/conf/config.yaml
 
 # Copy Java files in order to compile them as jars.
 COPY src/flink/partitioners/SymbolPartitioner.java /tmp/partitioner-src/com/crypto/partitioners/SymbolPartitioner.java
-COPY src/flink/UDAFs/Accumulator.java /tmp/udaf-src/com/crypto/udaf/Accumulator.java
-COPY src/flink/UDAFs/BoundaryValueAggFunction.java /tmp/udaf-src/com/crypto/udaf/BoundaryValueAggFunction.java
-COPY src/flink/UDAFs/FirstValueAggFunction.java /tmp/udaf-src/com/crypto/udaf/FirstValueAggFunction.java
-COPY src/flink/UDAFs/LastValueAggFunction.java /tmp/udaf-src/com/crypto/udaf/LastValueAggFunction.java
+
+COPY src/flink/UDAFs/first_and_last_value/Accumulator.java /tmp/udaf-src/com/crypto/udaf/Accumulator.java
+COPY src/flink/UDAFs/first_and_last_value/BoundaryValueAggFunction.java /tmp/udaf-src/com/crypto/udaf/BoundaryValueAggFunction.java
+COPY src/flink/UDAFs/first_and_last_value/FirstValueAggFunction.java /tmp/udaf-src/com/crypto/udaf/FirstValueAggFunction.java
+COPY src/flink/UDAFs/first_and_last_value/LastValueAggFunction.java /tmp/udaf-src/com/crypto/udaf/LastValueAggFunction.java
+
+COPY src/flink/UDAFs/safe_stddev_pop/StdDevAccumulator.java /tmp/udaf-src/com/crypto/udaf/StdDevAccumulator.java
+COPY src/flink/UDAFs/safe_stddev_pop/StdDevPopAggFunction.java /tmp/udaf-src/com/crypto/udaf/StdDevPopAggFunction.java
 
 RUN cd /tmp/partitioner-src && \
     javac -cp "/opt/flink/lib/*" com/crypto/partitioners/SymbolPartitioner.java && \
@@ -60,7 +64,9 @@ RUN cd /tmp/udaf-src && \
         com/crypto/udaf/Accumulator.java \
         com/crypto/udaf/BoundaryValueAggFunction.java \
         com/crypto/udaf/FirstValueAggFunction.java \
-        com/crypto/udaf/LastValueAggFunction.java && \
+        com/crypto/udaf/LastValueAggFunction.java \
+        com/crypto/udaf/StdDevAccumulator.java \
+        com/crypto/udaf/StdDevPopAggFunction.java &&\
     jar cf /opt/flink/lib/udafs.jar com/ && \
     rm -rf /tmp/udaf-src
 

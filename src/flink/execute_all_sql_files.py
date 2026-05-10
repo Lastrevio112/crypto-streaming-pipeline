@@ -54,6 +54,10 @@ t_env.create_java_function(
     "LAST_VALUE_TS",
     "com.crypto.udaf.LastValueAggFunction"
 )
+t_env.create_java_function(
+    "STDDEV_POP_SAFE",
+    "com.crypto.udaf.StdDevPopAggFunction"
+)
 
 # I wrote this function so I can add the file name without the full absolute path when calling the other function
 def computeAbsPath(path: str) -> str:

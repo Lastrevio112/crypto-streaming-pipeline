@@ -30,13 +30,7 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    COALESCE(
-        TRY_CAST(
-            CASE WHEN COUNT(price) > 1 THEN STDDEV_POP(price) ELSE NULL END
-            AS DOUBLE
-        ),
-        -1.0                        -- -1.0 records are corrupt and will be filtered later by Clickhouse
-    )                                                                       AS price_std_dev
+    STDDEV_POP_SAFE(price)                                                  AS price_std_dev
 
 FROM TUMBLE(
     DATA => TABLE unified_normalized_stream,
@@ -78,13 +72,7 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    COALESCE(
-        TRY_CAST(
-            CASE WHEN COUNT(price) > 1 THEN STDDEV_POP(price) ELSE NULL END
-            AS DOUBLE
-        ),
-        -1.0                        -- -1.0 records are corrupt and will be filtered later by Clickhouse
-    )                                                                       AS price_std_dev
+    STDDEV_POP_SAFE(price)                                                  AS price_std_dev
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,
@@ -127,13 +115,7 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    COALESCE(
-        TRY_CAST(
-            CASE WHEN COUNT(price) > 1 THEN STDDEV_POP(price) ELSE NULL END
-            AS DOUBLE
-        ),
-        -1.0                        -- -1.0 records are corrupt and will be filtered later by Clickhouse
-    )                                                                       AS price_std_dev
+    STDDEV_POP_SAFE(price)                                                  AS price_std_dev
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,
@@ -176,13 +158,7 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    COALESCE(
-        TRY_CAST(
-            CASE WHEN COUNT(price) > 1 THEN STDDEV_POP(price) ELSE NULL END
-            AS DOUBLE
-        ),
-        -1.0                        -- -1.0 records are corrupt and will be filtered later by Clickhouse
-    )                                                                       AS price_std_dev
+    STDDEV_POP_SAFE(price)                                                  AS price_std_dev
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,
