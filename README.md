@@ -43,8 +43,8 @@ The cleaning of our data, as well as the calculation of our 'business metrics' o
 **Folder structure**
 
 The folder structure for our Flink code is like this: 
-
-_src/
+```
+src/
 └── flink/
     ├── DDL/
     │   ├── DDL_flink_normalization.sql
@@ -68,8 +68,8 @@ _src/
             ├── StdDevAccumulator.java
             └── StdDevPopAggFunction.java
 execute_all_sql_files.py
-run_flink_from_checkpoint.sh_
-
+run_flink_from_checkpoint.sh
+```
 -The main orchestrator script that configures and runs our entire pipeline/DAG was written in Python (PyFlink) and it lives in src/flink/execute_all_sql_files.sql.
 
 -Custom UDAFs were written in Java that re-implement standard Flink functions if they were buggy or limited in some way - these live src/flink/UDAFs.
