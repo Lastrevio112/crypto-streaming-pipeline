@@ -26,7 +26,9 @@ SETTINGS
     kafka_format                    = 'AvroConfluent',
     format_avro_schema_registry_url = 'http://schema-registry:8081',
     kafka_num_consumers             = 1,
-    kafka_skip_broken_messages      = 1;   -- skip tombstones / malformed msgs
+    kafka_skip_broken_messages      = 1,   -- skip tombstones / malformed msgs
+    kafka_flush_interval_ms         = 500,
+    kafka_max_block_size            = 1000;
 
 CREATE TABLE IF NOT EXISTS src_5s_sliding
 (
