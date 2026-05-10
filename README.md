@@ -43,7 +43,32 @@ The cleaning of our data, as well as the calculation of our 'business metrics' o
 **Folder structure**
 
 The folder structure for our Flink code is like this: 
-<img width="433" height="687" alt="image" src="https://github.com/user-attachments/assets/c32078d3-11c7-4e90-814f-ade06975b521" />
+
+_src/
+└── flink/
+    ├── DDL/
+    │   ├── DDL_flink_normalization.sql
+    │   └── DDL_flink_OHLCV.sql
+    ├── DML/
+    │   ├── load_derived_metrics/
+    │   │   └── load_derived_ohlcv.sql
+    │   └── load_normalization/
+    │       ├── load_DS1_binance_normalized_stream.sql
+    │       ├── load_DS2_mexc_normalized_stream.sql
+    │       └── load_unified_normalized_stream.sql
+    ├── partitioners/
+    │   └── SymbolPartitioner.java
+    └── UDAFs/
+        ├── first_and_last_value/
+        │   ├── Accumulator.java
+        │   ├── BoundaryValueAggFunction.java
+        │   ├── FirstValueAggFunction.java
+        │   └── LastValueAggFunction.java
+        └── safe_stddev_pop/
+            ├── StdDevAccumulator.java
+            └── StdDevPopAggFunction.java
+execute_all_sql_files.py
+run_flink_from_checkpoint.sh_
 
 -The main orchestrator script that configures and runs our entire pipeline/DAG was written in Python (PyFlink) and it lives in src/flink/execute_all_sql_files.sql.
 
