@@ -15,6 +15,7 @@ config.set_string("rest.port", "8081")
 config.set_string("pipeline.name", JOB_NAME)
 config.set_string("execution.runtime-mode", "streaming")
 config.set_string("execution.target", "remote")
+config.set_string("execution.checkpointing.num-retained", "10") #Each checkpoint is around 1MB so we can afford to store more than 1 for safety
 
 # Here we keep all checkpoints in the same filesystem and sub-folder that will be mounted to a Docker volume. 
 # This is so all jobs can re-use the same checkpoint config, even if a container is rebuilt. 
