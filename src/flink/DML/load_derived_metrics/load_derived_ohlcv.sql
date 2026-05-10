@@ -17,7 +17,6 @@ SELECT
     SUM(price * quantity)                                                   AS quote_volume,
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
     MAX(quantity)                                                           AS max_single_trade_quantity,
-    SUM(price * quantity) / 
     SUM(price * quantity) / NULLIF(SUM(quantity), 0)                        AS vwap,
     SUM(CASE WHEN is_buy_or_sell = 'buy' THEN quantity END)                 AS aggressive_buy_volume,
     SUM(CASE WHEN is_buy_or_sell = 'sell' THEN quantity END)                AS aggressive_sell_volume,
@@ -32,8 +31,11 @@ SELECT
         END
     )                                                                       AS aggressive_sell_trade_count,
     COALESCE(
-        TRY_CAST(STDDEV_POP(price) AS DECIMAL(21, 8)),
-        CAST(-1.0 AS DECIMAL(21, 8))    -- -1.0 records are corrupt and will be filtered later by Clickhouse
+        TRY_CAST(
+            CASE WHEN COUNT(price) > 1 THEN STDDEV_POP(price) ELSE NULL END
+            AS DOUBLE
+        ),
+        -1.0                        -- -1.0 records are corrupt and will be filtered later by Clickhouse
     )                                                                       AS price_std_dev
 
 FROM TUMBLE(
@@ -63,7 +65,6 @@ SELECT
     SUM(price * quantity)                                                   AS quote_volume,
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
     MAX(quantity)                                                           AS max_single_trade_quantity,
-    SUM(price * quantity) / 
     SUM(price * quantity) / NULLIF(SUM(quantity), 0)                        AS vwap,
     SUM(CASE WHEN is_buy_or_sell = 'buy' THEN quantity END)                 AS aggressive_buy_volume,
     SUM(CASE WHEN is_buy_or_sell = 'sell' THEN quantity END)                AS aggressive_sell_volume,
@@ -78,8 +79,11 @@ SELECT
         END
     )                                                                       AS aggressive_sell_trade_count,
     COALESCE(
-        TRY_CAST(STDDEV_POP(price) AS DECIMAL(21, 8)),
-        CAST(-1.0 AS DECIMAL(21, 8))    -- -1.0 records are corrupt and will be filtered later by Clickhouse
+        TRY_CAST(
+            CASE WHEN COUNT(price) > 1 THEN STDDEV_POP(price) ELSE NULL END
+            AS DOUBLE
+        ),
+        -1.0                        -- -1.0 records are corrupt and will be filtered later by Clickhouse
     )                                                                       AS price_std_dev
 
 FROM HOP(
@@ -110,7 +114,6 @@ SELECT
     SUM(price * quantity)                                                   AS quote_volume,
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
     MAX(quantity)                                                           AS max_single_trade_quantity,
-    SUM(price * quantity) / 
     SUM(price * quantity) / NULLIF(SUM(quantity), 0)                        AS vwap,
     SUM(CASE WHEN is_buy_or_sell = 'buy' THEN quantity END)                 AS aggressive_buy_volume,
     SUM(CASE WHEN is_buy_or_sell = 'sell' THEN quantity END)                AS aggressive_sell_volume,
@@ -125,8 +128,11 @@ SELECT
         END
     )                                                                       AS aggressive_sell_trade_count,
     COALESCE(
-        TRY_CAST(STDDEV_POP(price) AS DECIMAL(21, 8)),
-        CAST(-1.0 AS DECIMAL(21, 8))    -- -1.0 records are corrupt and will be filtered later by Clickhouse
+        TRY_CAST(
+            CASE WHEN COUNT(price) > 1 THEN STDDEV_POP(price) ELSE NULL END
+            AS DOUBLE
+        ),
+        -1.0                        -- -1.0 records are corrupt and will be filtered later by Clickhouse
     )                                                                       AS price_std_dev
 
 FROM HOP(
@@ -157,7 +163,6 @@ SELECT
     SUM(price * quantity)                                                   AS quote_volume,
     CAST(COUNT(*) AS INT)                                                   AS trade_count,
     MAX(quantity)                                                           AS max_single_trade_quantity,
-    SUM(price * quantity) / 
     SUM(price * quantity) / NULLIF(SUM(quantity), 0)                        AS vwap,
     SUM(CASE WHEN is_buy_or_sell = 'buy' THEN quantity END)                 AS aggressive_buy_volume,
     SUM(CASE WHEN is_buy_or_sell = 'sell' THEN quantity END)                AS aggressive_sell_volume,
@@ -172,8 +177,11 @@ SELECT
         END
     )                                                                       AS aggressive_sell_trade_count,
     COALESCE(
-        TRY_CAST(STDDEV_POP(price) AS DECIMAL(21, 8)),
-        CAST(-1.0 AS DECIMAL(21, 8))    -- -1.0 records are corrupt and will be filtered later by Clickhouse
+        TRY_CAST(
+            CASE WHEN COUNT(price) > 1 THEN STDDEV_POP(price) ELSE NULL END
+            AS DOUBLE
+        ),
+        -1.0                        -- -1.0 records are corrupt and will be filtered later by Clickhouse
     )                                                                       AS price_std_dev
 
 FROM HOP(
