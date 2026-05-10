@@ -108,6 +108,7 @@ services:
       FLINK_PROPERTIES: |
         jobmanager.rpc.address: jobmanager
         jobmanager.memory.process.size: 1024m
+      PYTHONPATH: /workspace
     volumes:
       - flink-checkpoints:/opt/flink/checkpoints
       - ./flink-libs:/opt/flink/lib/extra   # mount a local folder with JARs
@@ -189,6 +190,7 @@ services:
         condition: service_started
     environment:
       - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/workspace
     volumes:
       - ..:/workspace
       - flink-checkpoints:/opt/flink/checkpoints

@@ -4,6 +4,7 @@ from pyflink.common import Configuration
 from pyflink.datastream import CheckpointingMode, ExternalizedCheckpointRetention
 import os
 
+
 FLINK_REST = "http://jobmanager:8081"
 SAVEPOINT_DIR = "file:///tmp/flink-savepoints"
 JOB_NAME = "flink_pipeline"
@@ -60,11 +61,6 @@ t_env.create_java_function(
     "com.crypto.udaf.StdDevPopAggFunction"
 )
 
-# I wrote this function so I can add the file name without the full absolute path when calling the other function
-def computeAbsPath(path: str) -> str:
-    SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(SCRIPT_DIR, path)
-
 
 # Read all queries from a .sql file in the specified path, tokenize them by ; and execute them
 def execute_sql_file(t_env, file_path, is_DML: bool):
@@ -97,7 +93,7 @@ list_of_paths = [
 # In this loop, DDL statements will be executed while DML statements will be added to the statement set
 for path, is_DML in list_of_paths:
     # print(path, stmt_set_ref)
-    execute_sql_file(t_env, file_path=computeAbsPath(path), is_DML=is_DML)
+    execute_sql_file(t_env, file_path="/workspace/src/flink/" + path, is_DML=is_DML)
 
 print(stmt_set.explain())
 
