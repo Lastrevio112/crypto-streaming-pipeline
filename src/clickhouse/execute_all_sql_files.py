@@ -5,8 +5,9 @@ import os
 def execute_sql_file(client: clickhouse_connect.driver.client, file_path):
     with open(file_path, 'r') as f:
         sql = f.read()
-        for statement in sql.split(';'):
-            if statement.strip():
+        statements = sql.split(';')
+        for statement_no, statement in enumerate(statements):
+            if statement.strip() and statement_no != len(statements)-1:
                 client.command(statement)
 
 if __name__ == '__main__':
@@ -22,10 +23,16 @@ if __name__ == '__main__':
     )
 
     list_of_paths = [
-        #I will fill this in later
+        "DDL_src/src_1s_tumbling.sql",
+        "DDL_src/src_5s_sliding.sql",
+        "DDL_src/src_1m_sliding.sql",
+        "DDL_src/src_5m_sliding.sql"
     ]
 
     for path in list_of_paths:
-        execute_sql_file(conn, "/workspace/src/clickhouse/" + path)
+        try:
+            execute_sql_file(conn, "/workspace/src/clickhouse/" + path)
+        except Exception as e:
+            print(e)
 
     conn.close()

@@ -30,7 +30,7 @@ WITH (
     'value.avro-confluent.url'      = 'http://schema-registry:8081',
     'key.format'                    = 'json',
     'value.format'                  = 'avro-confluent',
-    'value.fields-include'          = 'EXCEPT_KEY'
+    'value.fields-include'          = 'ALL'
 );
 
 -- 1s sliding step
@@ -63,7 +63,7 @@ WITH (
     'value.avro-confluent.url'      = 'http://schema-registry:8081',
     'key.format'                    = 'json',
     'value.format'                  = 'avro-confluent',
-    'value.fields-include'          = 'EXCEPT_KEY'
+    'value.fields-include'          = 'ALL'
 );
 
 -- 5s sliding step
@@ -96,7 +96,7 @@ WITH (
     'value.avro-confluent.url'      = 'http://schema-registry:8081',
     'key.format'                    = 'json',
     'value.format'                  = 'avro-confluent',
-    'value.fields-include'          = 'EXCEPT_KEY'
+    'value.fields-include'          = 'ALL'
 );
 
 -- 30s sliding step
@@ -129,5 +129,5 @@ WITH (
     'value.avro-confluent.url'      = 'http://schema-registry:8081',
     'key.format'                    = 'json',
     'value.format'                  = 'avro-confluent',
-    'value.fields-include'          = 'EXCEPT_KEY'
+    'value.fields-include'          = 'ALL'
 );
