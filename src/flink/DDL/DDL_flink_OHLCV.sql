@@ -20,7 +20,7 @@ CREATE TABLE derived_ohlcv_1s_tumbling(
     aggressive_sell_trade_count INT,
     price_std_dev               DOUBLE,
     PRIMARY KEY (coin_symbol, window_start) NOT ENFORCED,
-    WATERMARK FOR window_end AS window_end - INTERVAL '0.35' SECOND
+    WATERMARK FOR window_end AS window_end - INTERVAL '1.25' SECOND
 )
 WITH (
     'connector'                     = 'upsert-kafka',
@@ -53,7 +53,7 @@ CREATE TABLE derived_ohlcv_5s_sliding(
     aggressive_sell_trade_count INT,
     price_std_dev               DOUBLE,
     PRIMARY KEY (coin_symbol, window_start) NOT ENFORCED,
-    WATERMARK FOR window_end AS window_end - INTERVAL '0.35' SECOND
+    WATERMARK FOR window_end AS window_end - INTERVAL '1.25' SECOND
 )
 WITH (
     'connector'                     = 'upsert-kafka',
@@ -86,7 +86,7 @@ CREATE TABLE derived_ohlcv_1m_sliding(
     aggressive_sell_trade_count INT,
     price_std_dev               DOUBLE,
     PRIMARY KEY (coin_symbol, window_start) NOT ENFORCED,
-    WATERMARK FOR window_end AS window_end - INTERVAL '0.75' SECOND
+    WATERMARK FOR window_end AS window_end - INTERVAL '1.25' SECOND
 )
 WITH (
     'connector'                     = 'upsert-kafka',
@@ -119,7 +119,7 @@ CREATE TABLE derived_ohlcv_5m_sliding(
     aggressive_sell_trade_count INT,
     price_std_dev               DOUBLE,
     PRIMARY KEY (coin_symbol, window_start) NOT ENFORCED,
-    WATERMARK FOR window_end AS window_end - INTERVAL '1' SECOND
+    WATERMARK FOR window_end AS window_end - INTERVAL '1.25' SECOND
 )
 WITH (
     'connector'                     = 'upsert-kafka',

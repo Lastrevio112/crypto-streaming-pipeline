@@ -10,8 +10,7 @@ CREATE TABLE IF NOT EXISTS binance_ds1_trades (
     q           STRING,        -- Quantity
     `T`         BIGINT,        -- trade time, UNIX
     m           BOOLEAN,        -- Is the buyer the market maker? True: sell trade, False: buy trade
-    trade_ts AS TO_TIMESTAMP_LTZ(`T`, 3),  --not in source data, needed for watermark calculation
-    WATERMARK FOR trade_ts AS trade_ts - INTERVAL '0.25' SECOND
+    trade_ts AS TO_TIMESTAMP_LTZ(`T`, 3)  --not in source data, needed for watermark calculation
 ) WITH (
     'connector'                     = 'kafka',
     'topic'                         = 'binance_ds1_trades',
@@ -81,7 +80,7 @@ CREATE TABLE IF NOT EXISTS DS1_binance_normalized_stream (
     price           DECIMAL(21, 8),
     quantity        DECIMAL(21, 8),
     is_buy_or_sell  STRING,
-    WATERMARK FOR trade_time AS trade_time - INTERVAL '0.25' SECOND
+    WATERMARK FOR trade_time AS trade_time - INTERVAL '1' SECOND
 ) 
 WITH (
     'connector'                     = 'kafka',
@@ -106,7 +105,7 @@ CREATE TABLE IF NOT EXISTS DS2_mexc_normalized_stream (
     price           DECIMAL(21, 8),
     quantity        DECIMAL(21, 8),
     is_buy_or_sell  STRING,
-    WATERMARK FOR trade_time AS trade_time - INTERVAL '0.25' SECOND 
+    WATERMARK FOR trade_time AS trade_time - INTERVAL '1' SECOND 
 ) 
 WITH (
     'connector'                     = 'kafka',
@@ -135,7 +134,7 @@ CREATE TABLE IF NOT EXISTS unified_normalized_stream (
     quantity        DECIMAL(21, 8),
     is_buy_or_sell  STRING,
     data_source_id  INT,
-    WATERMARK FOR trade_time AS trade_time - INTERVAL '0.25' SECOND
+    WATERMARK FOR trade_time AS trade_time - INTERVAL '1' SECOND
 ) 
 WITH (
     'connector'                     = 'kafka',
