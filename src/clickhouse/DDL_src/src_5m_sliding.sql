@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS kafka_derived_ohlcv_5m_sliding
     low_price                   Decimal(21, 8),
     close_price                 Decimal(21, 8),
     volume                      Decimal(21, 8),
-    quote_volume                Decimal(21, 8) CODEC(Delta, ZSTD(1)),
+    quote_volume                Decimal(21, 8) CODEC(ZSTD(1)),
     trade_count                 Int32,
     max_single_trade_quantity   Decimal(21, 8),
     vwap                        Decimal(21, 8),
@@ -16,13 +16,15 @@ CREATE TABLE IF NOT EXISTS kafka_derived_ohlcv_5m_sliding
     aggressive_sell_volume      Decimal(21, 8),
     aggressive_buy_trade_count  Int32,
     aggressive_sell_trade_count Int32,
-    price_std_dev               Float64
+    price_std_dev               Float64,
+    sum_price                   Nullable(Decimal(21,8)),
+    sum_price_sq                Nullable(Decimal(21,8))
 )
 ENGINE = Kafka
 SETTINGS
     kafka_broker_list               = 'kafka:9092',
     kafka_topic_list                = 'derived_ohlcv_5m_sliding',
-    kafka_group_name                = 'clickhouse_ohlcv_5m_sliding',
+    kafka_group_name                = 'clickhouse_ohlcv_5m_sliding_v2',
     kafka_format                    = 'AvroConfluent',
     format_avro_schema_registry_url = 'http://schema-registry:8081',
     kafka_num_consumers             = 1,
@@ -40,7 +42,7 @@ CREATE TABLE IF NOT EXISTS src_5m_sliding
     low_price                   Decimal(21, 8),
     close_price                 Decimal(21, 8),
     volume                      Decimal(21, 8),
-    quote_volume                Decimal(21, 8) CODEC(Delta, ZSTD(1)),
+    quote_volume                Decimal(21, 8) CODEC(ZSTD(1)),
     trade_count                 Int32,
     max_single_trade_quantity   Decimal(21, 8),
     vwap                        Decimal(21, 8),
@@ -80,6 +82,8 @@ SELECT
     aggressive_sell_volume,
     aggressive_buy_trade_count,
     aggressive_sell_trade_count,
-    price_std_dev
+    price_std_dev,
+    sum_price,
+    sum_price_sq
 FROM kafka_derived_ohlcv_5m_sliding
 WHERE coin_symbol != '';   -- filter tombstone/empty messages

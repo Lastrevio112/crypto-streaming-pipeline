@@ -6,3 +6,4 @@ websocket-proto/
 src/kafka_producers/DS1/test_consumer_not_in_production.py
 src/kafka_producers/DS2/test_consumer_2.py
 .env.clickhouse
+src/clickhouse/one_time_script.sql

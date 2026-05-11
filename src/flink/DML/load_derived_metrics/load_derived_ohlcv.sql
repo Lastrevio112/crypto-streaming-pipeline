@@ -3,7 +3,7 @@
 INSERT INTO derived_ohlcv_1s_tumbling(
     coin_symbol, window_start, window_end, open_price, high_price, low_price, close_price, volume, 
     quote_volume, trade_count, max_single_trade_quantity, vwap, aggressive_buy_volume, aggressive_sell_volume, 
-    aggressive_buy_trade_count, aggressive_sell_trade_count, price_std_dev
+    aggressive_buy_trade_count, aggressive_sell_trade_count, price_std_dev, sum_price, sum_price_sq
 )
 SELECT
     coin_symbol,
@@ -30,7 +30,9 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    STDDEV_POP_SAFE(price)                                                  AS price_std_dev
+    STDDEV_POP_SAFE(price)                                                  AS price_std_dev,
+    SUM(price)                                                              AS sum_price,
+    SUM(price * price)                                                      AS sum_price_sq
 
 FROM TUMBLE(
     DATA => TABLE unified_normalized_stream,
@@ -45,7 +47,7 @@ GROUP BY coin_symbol, window_start, window_end;
 INSERT INTO derived_ohlcv_5s_sliding(
     coin_symbol, window_start, window_end, open_price, high_price, low_price, close_price, volume, 
     quote_volume, trade_count, max_single_trade_quantity, vwap, aggressive_buy_volume, aggressive_sell_volume, 
-    aggressive_buy_trade_count, aggressive_sell_trade_count, price_std_dev
+    aggressive_buy_trade_count, aggressive_sell_trade_count, price_std_dev, sum_price, sum_price_sq
 )
 SELECT
     coin_symbol,
@@ -72,7 +74,9 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    STDDEV_POP_SAFE(price)                                                  AS price_std_dev
+    STDDEV_POP_SAFE(price)                                                  AS price_std_dev,
+    SUM(price)                                                              AS sum_price,
+    SUM(price * price)                                                      AS sum_price_sq
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,
@@ -88,7 +92,7 @@ GROUP BY coin_symbol, window_start, window_end;
 INSERT INTO derived_ohlcv_1m_sliding(
     coin_symbol, window_start, window_end, open_price, high_price, low_price, close_price, volume, 
     quote_volume, trade_count, max_single_trade_quantity, vwap, aggressive_buy_volume, aggressive_sell_volume, 
-    aggressive_buy_trade_count, aggressive_sell_trade_count, price_std_dev
+    aggressive_buy_trade_count, aggressive_sell_trade_count, price_std_dev, sum_price, sum_price_sq
 )
 SELECT
     coin_symbol,
@@ -115,7 +119,9 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    STDDEV_POP_SAFE(price)                                                  AS price_std_dev
+    STDDEV_POP_SAFE(price)                                                  AS price_std_dev,
+    SUM(price)                                                              AS sum_price,
+    SUM(price * price)                                                      AS sum_price_sq
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,
@@ -131,7 +137,7 @@ GROUP BY coin_symbol, window_start, window_end;
 INSERT INTO derived_ohlcv_5m_sliding(
     coin_symbol, window_start, window_end, open_price, high_price, low_price, close_price, volume, 
     quote_volume, trade_count, max_single_trade_quantity, vwap, aggressive_buy_volume, aggressive_sell_volume, 
-    aggressive_buy_trade_count, aggressive_sell_trade_count, price_std_dev
+    aggressive_buy_trade_count, aggressive_sell_trade_count, price_std_dev, sum_price, sum_price_sq
 )
 SELECT
     coin_symbol,
@@ -158,7 +164,9 @@ SELECT
         ELSE 0 
         END
     )                                                                       AS aggressive_sell_trade_count,
-    STDDEV_POP_SAFE(price)                                                  AS price_std_dev
+    STDDEV_POP_SAFE(price)                                                  AS price_std_dev,
+    SUM(price)                                                              AS sum_price,
+    SUM(price * price)                                                      AS sum_price_sq
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,

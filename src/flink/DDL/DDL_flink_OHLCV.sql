@@ -19,6 +19,8 @@ CREATE TABLE derived_ohlcv_1s_tumbling(
     aggressive_buy_trade_count  INT,
     aggressive_sell_trade_count INT,
     price_std_dev               DOUBLE,
+    sum_price                   DECIMAL(21, 8),
+    sum_price_sq                DECIMAL(21, 8),
     PRIMARY KEY (coin_symbol, window_start) NOT ENFORCED,
     WATERMARK FOR window_end AS window_end - INTERVAL '1.25' SECOND
 )
@@ -52,6 +54,8 @@ CREATE TABLE derived_ohlcv_5s_sliding(
     aggressive_buy_trade_count  INT,
     aggressive_sell_trade_count INT,
     price_std_dev               DOUBLE,
+    sum_price                   DECIMAL(21, 8),
+    sum_price_sq                DECIMAL(21, 8),
     PRIMARY KEY (coin_symbol, window_start) NOT ENFORCED,
     WATERMARK FOR window_end AS window_end - INTERVAL '1.25' SECOND
 )
@@ -85,6 +89,8 @@ CREATE TABLE derived_ohlcv_1m_sliding(
     aggressive_buy_trade_count  INT,
     aggressive_sell_trade_count INT,
     price_std_dev               DOUBLE,
+    sum_price                   DECIMAL(21, 8),
+    sum_price_sq                DECIMAL(21, 8),
     PRIMARY KEY (coin_symbol, window_start) NOT ENFORCED,
     WATERMARK FOR window_end AS window_end - INTERVAL '1.25' SECOND
 )
@@ -118,6 +124,8 @@ CREATE TABLE derived_ohlcv_5m_sliding(
     aggressive_buy_trade_count  INT,
     aggressive_sell_trade_count INT,
     price_std_dev               DOUBLE,
+    sum_price                   DECIMAL(21, 8),
+    sum_price_sq                DECIMAL(21, 8),
     PRIMARY KEY (coin_symbol, window_start) NOT ENFORCED,
     WATERMARK FOR window_end AS window_end - INTERVAL '1.25' SECOND
 )
