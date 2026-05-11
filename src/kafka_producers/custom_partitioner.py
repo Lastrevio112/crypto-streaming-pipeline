@@ -4,11 +4,11 @@ import hashlib
 
 def custom_partitioner(key: str, num_partitions: int):
     PARTITION_MAP = {
-        "BABYUSDT": 0,
-        "ETHUSDT": 1,
-        "MEGAUSDT": 2,
-        "CHIPUSDT": 3,
-        "BTCUSDT": 4
+        "ETHUSDT": 0,
+        "BTCUSDT": 1,
+        "SUIUSDT": 2,
+        "SOLUSDT": 3,
+        "CHIPUSDT": 4
     }
     FALLBACK_START = 5 # Partitions 5-9 for the remaining coins
 

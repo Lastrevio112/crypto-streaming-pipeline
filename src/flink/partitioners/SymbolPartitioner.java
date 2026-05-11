@@ -11,11 +11,11 @@ import java.math.BigInteger;
 public class SymbolPartitioner implements KafkaPartitioner<Object>  {
 
     private static final Map<String, Integer> PARTITION_MAP = Map.of(
-        "BABYUSDT", 0,
-        "ETHUSDT",  1,
-        "MEGAUSDT", 2,
-        "CHIPUSDT", 3,
-        "BTCUSDT",  4
+        "ETHUSDT", 0,
+        "BTCUSDT", 1,
+        "SUIUSDT", 2,
+        "SOLUSDT", 3,
+        "CHIPUSDT", 4
     );
     private static final int FALLBACK_START = 5;
 
