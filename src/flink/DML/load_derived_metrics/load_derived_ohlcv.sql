@@ -32,7 +32,7 @@ SELECT
     )                                                                       AS aggressive_sell_trade_count,
     STDDEV_POP_SAFE(price)                                                  AS price_std_dev,
     SUM(price)                                                              AS sum_price,
-    SUM(price * price)                                                      AS sum_price_sq
+    SUM(CAST(price AS DECIMAL(18, 4)) * CAST(price AS DECIMAL(18, 4)))      AS sum_price_sq     --to avoid decimal overflow for huge values
 
 FROM TUMBLE(
     DATA => TABLE unified_normalized_stream,
@@ -76,7 +76,7 @@ SELECT
     )                                                                       AS aggressive_sell_trade_count,
     STDDEV_POP_SAFE(price)                                                  AS price_std_dev,
     SUM(price)                                                              AS sum_price,
-    SUM(price * price)                                                      AS sum_price_sq
+    SUM(CAST(price AS DECIMAL(18, 4)) * CAST(price AS DECIMAL(18, 4)))      AS sum_price_sq     --to avoid decimal overflow for huge values
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,
@@ -121,7 +121,7 @@ SELECT
     )                                                                       AS aggressive_sell_trade_count,
     STDDEV_POP_SAFE(price)                                                  AS price_std_dev,
     SUM(price)                                                              AS sum_price,
-    SUM(price * price)                                                      AS sum_price_sq
+    SUM(CAST(price AS DECIMAL(18, 4)) * CAST(price AS DECIMAL(18, 4)))      AS sum_price_sq     --to avoid decimal overflow for huge values
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,
@@ -166,7 +166,7 @@ SELECT
     )                                                                       AS aggressive_sell_trade_count,
     STDDEV_POP_SAFE(price)                                                  AS price_std_dev,
     SUM(price)                                                              AS sum_price,
-    SUM(price * price)                                                      AS sum_price_sq
+    SUM(CAST(price AS DECIMAL(18, 4)) * CAST(price AS DECIMAL(18, 4)))      AS sum_price_sq     --to avoid decimal overflow for huge values
 
 FROM HOP(
     DATA => TABLE unified_normalized_stream,
