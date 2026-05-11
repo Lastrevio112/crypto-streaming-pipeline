@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS kafka_derived_ohlcv_5s_sliding
 (
     coin_symbol                 LowCardinality(String),
-    window_start                DateTime64(3),
-    window_end                  DateTime64(3),
+    window_start                DateTime64(3) CODEC(Delta(8), ZSTD(2)),
+    window_end                  DateTime64(3) CODEC(Delta(8), ZSTD(2)),
     open_price                  Decimal(21, 8),
     high_price                  Decimal(21, 8),
     low_price                   Decimal(21, 8),
@@ -33,8 +33,8 @@ SETTINGS
 CREATE TABLE IF NOT EXISTS src_5s_sliding
 (
     coin_symbol                 LowCardinality(String),
-    window_start                DateTime64(3),
-    window_end                  DateTime64(3),
+    window_start                DateTime64(3) CODEC(Delta(8), ZSTD(2)),
+    window_end                  DateTime64(3) CODEC(Delta(8), ZSTD(2)),
     open_price                  Decimal(21, 8),
     high_price                  Decimal(21, 8),
     low_price                   Decimal(21, 8),
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS src_5s_sliding
     aggressive_buy_trade_count  Int32,
     aggressive_sell_trade_count Int32,
     price_std_dev               Float64,
-    _ingested_at                DateTime64(3) DEFAULT now64(3)
+    _ingested_at                DateTime64(3) DEFAULT now64(3) CODEC(Delta(8), ZSTD(2))
 )
 ENGINE = MergeTree      -- Faster than ReplaceMergeTree, and we don't care about exactly-once semantics as we can effortlessly filter duplicates downstream
 PARTITION BY toDate(window_start)
