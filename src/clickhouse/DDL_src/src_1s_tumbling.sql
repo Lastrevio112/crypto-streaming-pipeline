@@ -49,6 +49,8 @@ CREATE TABLE IF NOT EXISTS src_1s_tumbling
     aggressive_buy_trade_count  Int32,
     aggressive_sell_trade_count Int32,
     price_std_dev               Float64,
+    sum_price                   Nullable(Decimal(21,8)),
+    sum_price_sq                Nullable(Decimal(21,8)),
     _ingested_at                DateTime64(3) DEFAULT now64(3) CODEC(Delta(8), ZSTD(2))
 )
 ENGINE = MergeTree      -- Faster than ReplaceMergeTree, and we don't care about exactly-once semantics as we can effortlessly filter duplicates downstream
