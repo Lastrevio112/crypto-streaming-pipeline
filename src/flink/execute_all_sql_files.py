@@ -95,7 +95,8 @@ for path, is_DML in list_of_paths:
     # print(path, stmt_set_ref)
     execute_sql_file(t_env, file_path="/workspace/src/flink/" + path, is_DML=is_DML)
 
-print(stmt_set.explain())
+# Uncomment this line only for debugging:
+#print(stmt_set.explain())
 
 # Execute all DML statements as a named job for future idempotency
 print(f"Launching {JOB_NAME}...")

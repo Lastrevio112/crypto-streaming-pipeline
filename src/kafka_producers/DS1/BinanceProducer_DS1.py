@@ -34,6 +34,11 @@ class BinanceProducer_DS1(WebSocketProducer):
                 print(f"Subscription failed: {data}")
             return
         
+        # Handle Binance application-level ping
+        if "ping" in data:
+            ws.send(json.dumps({"pong": data["ping"]}))
+            return
+        
         # Binance warns 10 minutes before 24h disconnection
         if data.get("e") == "serverShutdown":
             print("serverShutdown received, closing connection for reconnect...")
