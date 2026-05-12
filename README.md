@@ -3,7 +3,8 @@ This is an in-progress streaming pipeline using Kafka, Flink, FastAPI, Javascrip
 
 # DATA FLOW UNTIL NOW
 
-<img width="1386" height="398" alt="Data Flow" src="https://github.com/user-attachments/assets/63f337df-c2a4-45b5-9043-9bfaf98b2efe" />
+<img width="1570" height="938" alt="Data Flow" src="https://github.com/user-attachments/assets/e5c457a0-e51a-41da-ba04-e8b2e901e413" />
+
 
 # KAFKA PRODUCERS DOCUMENTATION
 
