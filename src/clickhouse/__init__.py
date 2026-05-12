@@ -1,0 +1,2 @@
+from views.AnalyticsSlidingView import AnalyticsSlidingView
+from views.AnalyticsTumbleView import AnalyticsTumbleView
