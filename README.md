@@ -127,3 +127,17 @@ Another thing worth noting about the derived tables: I only computed metrics tha
 A note on UDAFs: I had to re-implement in Java the FIRST_VALUE and LAST_VALUE functions, to compute the open and close price per candle. This is because the built-in Flink functions cannot be used within sliding windows that have a group by. I also had to re-implement the standard deviation function in Java because the built-in one literally had a bug that would crash my pipeline (it would try to convert 'NaN' to DECIMAL for windows with zero trades), no matter how many TRY_CASTs and COALESCEs I would add in SQL.
 
 The custom Java UDAFs were written by extending the AggregateFunction class, writing a custom Accumulator and implementing/overriding the accumulate, merge, retract and getValue methods accordingly. (For what each of those four methods do in Flink Java, please refer to the official Flink documentation [here](https://nightlies.apache.org/flink/flink-docs-stable/api/java/org/apache/flink/table/functions/AggregateFunction.html).)
+
+# CLICKHOUSE DOCUMENTATION
+
+Under src/DDL_src we have 4 .sql files each defining 3 entities: a kafka connector, a materialized view and a final table. For example: kafka_derived_ohlcv_5s_sliding (the connector), mv_src_5s_sliding (the materializied view), src_5s_sliding (the actual table in the database storing the data that we can query from).
+
+The tables starting in "kafka_" are the simply Kafka-Clickhouse connectors that work under the hood as Kafka consumers - they are temporary 'landing zones' of each message, and once a message is 'consumed from the consumer' it disappears from the queue. They cannot be queried directly in Clickhouse.
+
+The materialized views are simply triggers, since they are inserting data into a MergeTree table - their only purpose is to move the data from the kafka consumers to the 'real' tables incrementally. This is one feature of Clickhouse: the incremental materialized view is not like a regular table that is simply refreshed periodically, instead it defines a rule on how to keep data up to date with each trigger, almost like in a CDC kind of way.
+
+Extra business metrics (net_flow, average_trade_size, etc.) were added in the final Analytics layer that Clickhouse queries from. These consist of 'regular' (non-materialized) views. They are separated into tumbling views, each representing a candle that can be selected in the front-end: 1s, 5s, 30s, 1m, 5m, 30m, 1h, 4h, 24h). There are three respective sliding window analytics views as well (corresponding to the three intervals from Flink).
+
+To avoid code duplication, I avoided copy-pasting the same code 9 times, and instead defined in Python a parent/base class called "AnalyticsView" and had two child classes inherit from it (AnalyticsTumbleView and AnalyticsSlidingView) - the base class is an abstract class with the query generator as an abstract method.
+
+The execute_all_sql_files.py script executes all our code: creates tables, materialized views, replaces view definition, etc.
