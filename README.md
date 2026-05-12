@@ -35,7 +35,7 @@ We have two data sources: the public Binance websocket (data source 1) and the M
 
 We extract around 50 cryptocurrencies from each websocket: they are stored in a JSON file under src/serialized_data.
 
-Each data source corresponds to a separate Kafka topic. Each Kafka topic has 10 partitions. Five of the cryptocurrencies with the most traffic (BABYUSDT, ETHUSDT, MEGAUSDT, CHIPUSDT, BTCUSDT) each get their own partition.
+Each data source corresponds to a separate Kafka topic. Each Kafka topic has 10 partitions. Five of the cryptocurrencies with the most traffic (ETHUSDT, BTCUSDT, SUIUSDT, SOLUSDT, CHIPUSDT) each get their own partition.
 The other 45 coins are split evenly between the remaining 5 partitions based on a hash key + modulo.
 
 The custom partitioner lives in src/kafka_producers/custom_partitioner.py.
