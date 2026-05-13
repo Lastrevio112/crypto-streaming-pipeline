@@ -146,7 +146,7 @@ services:
 
   # This service starts the data generation each time the container is rebuilt by running our two producers
   kafka-producers-init:
-    container_name: crypyto-kafka-producers-init
+    container_name: crypto-kafka-producers-init
     platform: linux/arm64
     build:
       context: ..
@@ -201,6 +201,17 @@ services:
       "
     restart: "no"
   
+  grafana:
+    container_name: crypto-grafana
+    image: grafana/grafana-enterprise
+    environment:
+      - GF_PLUGINS_PREINSTALL=grafana-clickhouse-datasource
+    ports:
+      - '3000:3000'
+    restart: unless-stopped
+    volumes:
+      - grafana-storage:/var/lib/grafana
+  
 volumes:
   kafka-data:
   clickhouse-data:
@@ -208,3 +219,4 @@ volumes:
   clickhouse-config:
   clickhouse-users:
   flink-checkpoints:
+  grafana-storage:
