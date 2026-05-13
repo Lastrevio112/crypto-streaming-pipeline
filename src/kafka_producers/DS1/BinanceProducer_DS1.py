@@ -94,5 +94,5 @@ class BinanceProducer_DS1(WebSocketProducer):
     
     # Overriding parent class in order to send pings to Binance. For MEXC this is not needed as we have a customized ping mechanism.
     def run(self):
-        self.ws.run_forever(ping_interval=20, ping_timeout=10)
+        self.ws.run_forever(ping_interval=20, ping_timeout=10, reconnect=5)     # reconnecting in case of shutdown after 5 seconds
     

@@ -60,7 +60,7 @@ class WebSocketProducer(ABC):
         ping_thread.start()
     
     def run(self):
-        self.ws.run_forever()
+        self.ws.run_forever(reconnect=5)
 
     # This method is needed in data source 2 to close the connection after 23h and restart it
     def stop(self):
