@@ -1,11 +1,35 @@
 class SideBar extends HTMLElement {
+  // Child classes will override this value (0, 1, 2, or 3)
+  activeIndex = null;
+
   connectedCallback() {
-    this.innerHTML = `
-        <a href="index.html" class="active"><span class="icon">📈</span><span class="label">Price Evolution</span></a>
-        <a href="dashboard2.html"><span class="icon">📊</span><span class="label">Volume Analysis</span></a>
-        <a href="dashboard3.html"><span class="icon">⚡</span><span class="label">Singal Analysis</span></a>
-        <a href="dashboard4.html"><span class="icon">⚖️</span><span class="label">Coin Comparison</span></a>
-    `;
+    this.render();
+  }
+
+  render() {
+    const links = [
+      { href: "index.html", icon: "📈", label: "Price Evolution" },
+      { href: "dashboard2.html", icon: "📊", label: "Volume Analysis" },
+      { href: "dashboard3.html", icon: "⚡", label: "Signal Analysis" },
+      { href: "dashboard4.html", icon: "⚖️", label: "Coin Comparison" }
+    ];
+
+    this.innerHTML = links.map((link, index) => `
+      <a href="${link.href}" class="${this.activeIndex === index ? 'active' : ''}">
+        <span class="icon">${link.icon}</span>
+        <span class="label">${link.label}</span>
+      </a>
+    `).join('');
   }
 }
-customElements.define('custom-sidebar', SideBar);
+
+class SideBarPrice extends SideBar { activeIndex = 0; }
+class SideBarVolume extends SideBar { activeIndex = 1; }
+class SideBarSignal extends SideBar { activeIndex = 2; }
+class SideBarCompare extends SideBar { activeIndex = 3; }
+
+// Register the custom elements
+customElements.define('sidebar-price', SideBarPrice);
+customElements.define('sidebar-volume', SideBarVolume);
+customElements.define('sidebar-signal', SideBarSignal);
+customElements.define('sidebar-compare', SideBarCompare);
