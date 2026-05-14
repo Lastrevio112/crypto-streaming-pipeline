@@ -24,6 +24,8 @@ services:
         condition: service_started
       jobmanager:          
         condition: service_started
+    networks:
+      - crypto-network
     
   kafka:
     container_name: crypto-kafka
@@ -49,6 +51,8 @@ services:
     volumes:
     - kafka-data:/var/lib/kafka
     restart: unless-stopped
+    networks:
+      - crypto-network
   
   schema-registry:
     container_name: crypto-schema-registry
@@ -69,6 +73,8 @@ services:
       timeout: 10s
       retries: 10
     restart: unless-stopped
+    networks:
+      - crypto-network
     
   clickhouse:
     container_name: crypto-clickhouse
@@ -90,6 +96,8 @@ services:
         soft: 262144
         hard: 262144
     restart: unless-stopped
+    networks:
+      - crypto-network
 
   jobmanager:
     container_name: crypto-jobmanager
@@ -118,6 +126,8 @@ services:
       retries: 5
       start_period: 30s
     restart: unless-stopped
+    networks:
+      - crypto-network
 
   taskmanager:
     container_name: crypto-taskmanager
@@ -143,6 +153,8 @@ services:
       - ./flink-libs:/opt/flink/lib/extra
       - ..:/workspace
     restart: unless-stopped
+    networks:
+      - crypto-network
 
   # This service starts the data generation each time the container is rebuilt by running our two producers
   kafka-producers-init:
@@ -171,6 +183,8 @@ services:
         wait
       "
     restart: unless-stopped   #If one producer crashes, the container exits and restart: unless-stopped brings it back up
+    networks:
+      - crypto-network
 
   # This service exists only to run the DDL and DML scripts that Flink relies on, since these do not persist between container rebuilds.
   flink-init:
@@ -200,18 +214,27 @@ services:
         bash /workspace/src/flink/run_flink_from_checkpoint.sh
       "
     restart: "no"
+    networks:
+      - crypto-network
   
   grafana:
     container_name: crypto-grafana
     image: grafana/grafana-enterprise
     environment:
       - GF_PLUGINS_PREINSTALL=grafana-clickhouse-datasource
+      - GF_DASHBOARDS_MIN_REFRESH_INTERVAL=1s
     ports:
       - '3000:3000'
     restart: unless-stopped
     volumes:
       - grafana-storage:/var/lib/grafana
-  
+    networks:
+      - crypto-network
+
+networks:
+  crypto-network:
+    driver: bridge
+
 volumes:
   kafka-data:
   clickhouse-data:
