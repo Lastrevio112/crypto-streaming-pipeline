@@ -66,20 +66,56 @@ html, body {
 }
 
 #time-picker {
+  position: relative;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+}
+
+#time-selected {
   background: #22262b;
   color: #ccc;
   border: 1px solid #2a2d32;
-  padding: 4px 10px;
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 13px;
+  padding: 5px 12px;
   border-radius: 4px;
   cursor: pointer;
-  outline: none;
+  user-select: none;
 }
 
-#time-picker:hover, #time-picker:focus {
-  border-color: #555;
-  color: #fff;
+#time-selected:hover { 
+  color: #fff; 
+  border-color: #555; 
+}
+
+#time-options {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: #1e2228;
+  border: 1px solid #2a2d32;
+  border-radius: 4px;
+  min-width: 160px;
+  z-index: 200;
+}
+
+#time-options.open { 
+  display: block; 
+}
+
+.time-option {
+  padding: 8px 12px;
+  color: #888;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.time-option:hover { 
+  color: #fff; 
+  background: #2a2d32; 
+}
+
+.time-option.active { 
+  color: #00e5ff; 
 }
 
 iframe {

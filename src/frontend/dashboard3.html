@@ -12,7 +12,28 @@
     <a href="dashboard3.html" class="active"><span class="icon">⚡</span><span class="label">Singal Analysis</span></a>
     <a href="dashboard4.html"><span class="icon">⚖️</span><span class="label">Coin Comparison</span></a>
   </div>
+
+  <div id="topbar">
+    <div id="time-picker">
+      <div id="time-selected">Last 15 minutes ▾</div>
+      <div id="time-options">
+        <div class="time-option" data-value="now-5m">Last 5 minutes</div>
+        <div class="time-option active" data-value="now-15m">Last 15 minutes</div>
+        <div class="time-option" data-value="now-30m">Last 30 minutes</div>
+        <div class="time-option" data-value="now-1h">Last 1 hour</div>
+        <div class="time-option" data-value="now-4h">Last 4 hours</div>
+        <div class="time-option" data-value="now-12h">Last 12 hours</div>
+        <div class="time-option" data-value="now-24h">Last 24 hours</div>
+        <div class="time-option" data-value="now-2d">Last 2 days</div>
+        <div class="time-option" data-value="now-7d">Last 7 days</div>
+        <div class="time-option" data-value="now-14d">Last 14 days</div>
+      </div>
+    </div>
+  </div>
+  
   <iframe src="http://localhost:3000/d/adm42qh/volume-analysis?orgId=1&kiosk">
   </iframe>
+
+  <script src="app.js"></script>
 </body>
 </html>
