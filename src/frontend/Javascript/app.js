@@ -5,6 +5,7 @@ selected.addEventListener('click', function() {
   options.classList.toggle('open');
 });
 
+// Function that listens for changes in the time filter:
 document.querySelectorAll('.time-option').forEach(function(option) {
   option.addEventListener('click', function() {
     const from = this.dataset.value;
@@ -14,16 +15,15 @@ document.querySelectorAll('.time-option').forEach(function(option) {
 
     document.querySelectorAll('.time-option').forEach(o => o.classList.remove('active'));
     this.classList.add('active');
-
     options.classList.remove('open');
 
-    const iframe = document.querySelector('iframe');
-    const url = new URL(iframe.src);
-    url.searchParams.set('from', from);
-    url.searchParams.set('to', 'now');
-    url.searchParams.set('kiosk', 'true');
-    url.searchParams.set('inactive', '1');
-    iframe.src = url.toString();
+    document.querySelectorAll('iframe').forEach(iframe => {
+      const url = new URL(iframe.src);
+      url.searchParams.set('from', from);
+      url.searchParams.set('to', 'now');
+      url.searchParams.set('kiosk', 'true');
+      iframe.src = url.toString();
+    });
   });
 });
 
