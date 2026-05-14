@@ -2,39 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Price Evolution Dashboard</title>
+  <title>Coin Comparison Dashboard</title>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <div id="sidebar">
-    <a href="index.html"><span class="icon">📈</span><span class="label">Price Evolution</span></a>
-    <a href="dashboard2.html"><span class="icon">📊</span><span class="label">Volume Analysis</span></a>
-    <a href="dashboard3.html"><span class="icon">⚡</span><span class="label">Singal Analysis</span></a>
-    <a href="dashboard4.html" class="active"><span class="icon">⚖️</span><span class="label">Coin Comparison</span></a>
+    <custom-sidebar></custom-sidebar>
   </div>
 
   <div id="topbar">
-    <div id="time-picker">
-      <div id="time-selected">Last 15 minutes ▾</div>
-      <div id="time-options">
-        <div class="time-option" data-value="now-5m">Last 5 minutes</div>
-        <div class="time-option active" data-value="now-15m">Last 15 minutes</div>
-        <div class="time-option" data-value="now-30m">Last 30 minutes</div>
-        <div class="time-option" data-value="now-1h">Last 1 hour</div>
-        <div class="time-option" data-value="now-4h">Last 4 hours</div>
-        <div class="time-option" data-value="now-12h">Last 12 hours</div>
-        <div class="time-option" data-value="now-24h">Last 24 hours</div>
-        <div class="time-option" data-value="now-2d">Last 2 days</div>
-        <div class="time-option" data-value="now-7d">Last 7 days</div>
-        <div class="time-option" data-value="now-14d">Last 14 days</div>
-      </div>
+    <custom-topbar></custom-topbar>
+  </div>
+
+  <div id="dashboard">
+    <!-- Each chart goes under here: -->
+    <div class="chart-wrapper">
+      <div class="click-shield"></div>
+      <iframe 
+        src="http://localhost:3000/d-solo/ad2fplb/coin-comparison-dashboard?kiosk=true&orgId=1&timezone=browser&var-candle_interval=analytics_30s_tumbling&var-coin_symbol_1=BTCUSDT&var-coin_symbol_2=ETHUSDT&theme=dark&panelId=panel-2" width="450" height="200" frameborder="0">
+    </div>
+    
+    <div class="chart-wrapper">
+      <div class="click-shield"></div>
+      <iframe
+        src="http://localhost:3000/d-solo/ad2fplb/coin-comparison-dashboard?kiosk=true&orgId=1&timezone=browser&var-candle_interval=analytics_30s_tumbling&var-coin_symbol_1=BTCUSDT&var-coin_symbol_2=ETHUSDT&theme=dark&panelId=panel-3" width="450" height="200" frameborder="0">
+      </iframe>
+    </div>
+    
+    <div class="chart-wrapper">
+      <div class="click-shield"></div>
+      <iframe 
+        src="http://localhost:3000/d-solo/ad2fplb/coin-comparison-dashboard?kiosk=true&orgId=1&timezone=browser&var-candle_interval=analytics_30s_tumbling&var-coin_symbol_1=BTCUSDT&var-coin_symbol_2=ETHUSDT&theme=dark&panelId=panel-4" width="450" height="200" frameborder="0">
+      </iframe>
+    </div>
+
+    <div id="disclaimer">
+      <custom-disclaimer></custom-disclaimer>
     </div>
   </div>
-  
-  <iframe src="http://localhost:3000/d/ad2fplb/volume-analysis?orgId=1&kiosk">
-  </iframe>
 
-  <script src="app.js"></script>
+  <script src="Javascript/TopBar.js"></script>
+  <script src="Javascript/SideBar.js"></script>
+  <script src="Javascript/Disclaimer.js"></script>
+  <script src="Javascript/app.js"></script>
 </body>
 </html>
 

@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Price Evolution Dashboard</title>
   <link rel="stylesheet" href="style.css"/>
 </head>
+
 <body>
   <div id="sidebar">
     <custom-sidebar></custom-sidebar>
@@ -36,19 +38,18 @@
         src="http://localhost:3000/d-solo/adw9btb/price-evolution-analysis?kiosk=true&orgId=1&timezone=browser&var-candle_interval=analytics_30s_tumbling&var-coin_symbol=BTCUSDT&refresh=2s&theme=dark&panelId=panel-3" frameborder="0">
       </iframe>
     </div>
-    
-    <div id="disclaimer" class="chart-wrapper">
-      <div class="click-shield"></div>
-      <iframe class="disclaimer"
-        src="http://localhost:3000/d-solo/adw9btb/price-evolution-analysis?kiosk=true&orgId=1&timezone=browser&var-candle_interval=analytics_30s_tumbling&var-coin_symbol=BTCUSDT&refresh=2s&theme=dark&panelId=panel-5" frameborder="0">
-      </iframe>
+
+    <div id="disclaimer">
+      <custom-disclaimer></custom-disclaimer>
     </div>
   </div>
 
   <script src="Javascript/TopBar.js"></script>
   <script src="Javascript/SideBar.js"></script>
+  <script src="Javascript/Disclaimer.js"></script>
   <script src="Javascript/app.js"></script>
 </body>
+
 </html>
 
 
