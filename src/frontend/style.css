@@ -7,7 +7,17 @@
 html, body { 
   height: 100%; 
   background: #000; 
-  overflow: hidden; 
+  overflow-y: auto; /* Allow vertical scrolling */
+  overflow-x: hidden; 
+}
+
+#dashboard {
+  margin-left: 48px; /* Width of the collapsed sidebar */
+  margin-top: 40px;  /* Height of the topbar */
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Space between charts */
 }
 
 #sidebar {
@@ -120,9 +130,9 @@ html, body {
 
 iframe {
   display: block;
-  width: calc(100vw - 48px);
-  height: 100vh;
+  width: 100%;       /* Fill the container width */
+  height: 500px;     /* Set a fixed height so they don't look squashed */
   border: none;
-  margin-left: 48px;
-  margin-top: 40px;
+  border-radius: 4px;
+  background: #141619; /* Match Grafana background while loading */
 }
