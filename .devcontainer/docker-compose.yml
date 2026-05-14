@@ -223,6 +223,10 @@ services:
     environment:
       - GF_PLUGINS_PREINSTALL=grafana-clickhouse-datasource
       - GF_DASHBOARDS_MIN_REFRESH_INTERVAL=1s
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_SECURITY_COOKIE_SAMESITE=disabled
     ports:
       - '3000:3000'
     restart: unless-stopped
