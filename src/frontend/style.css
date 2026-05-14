@@ -251,6 +251,80 @@ custom-topbar {
 
 
 
+#coin-picker {
+  position: relative;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+}
+
+#coin-selected {
+  padding: 6px 10px;
+  color: #d4d9e3;
+  font-size: 13px;
+  font-family: 'Inter', system-ui, sans-serif;
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  border: none;
+  white-space: nowrap;
+}
+
+#coin-selected:hover {
+  background: #2c3140;
+  color: #fff;
+}
+
+#coin-options {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: #1e2228;
+  border: 1px solid #2a2d32;
+  border-radius: 4px;
+  min-width: 160px;
+  max-height: 260px;   /* ~8 visible options */
+  overflow-y: auto;
+  z-index: 200;
+}
+
+#coin-options.open { display: block; }
+
+.coin-option {
+  padding: 8px 12px;
+  color: #888;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.coin-option:hover { color: #fff; background: #2a2d32; }
+.coin-option.active { color: #00e5ff; }
+
+
+#coin-options {
+  scrollbar-width: thin;                        /* Firefox */
+  scrollbar-color: #2c3140 transparent;         /* Firefox: thumb track */
+}
+
+#coin-options::-webkit-scrollbar {
+  width: 6px;
+}
+
+#coin-options::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#coin-options::-webkit-scrollbar-thumb {
+  background: #2c3140;
+  border-radius: 3px;
+}
+
+#coin-options::-webkit-scrollbar-thumb:hover {
+  background: #3d4459;
+}
+
+
+
 iframe {
   display: block;
   width: 100%;       /* Fill the container width */

@@ -1,5 +1,22 @@
+const COINS = [
+  'AAVEUSDT','ADAUSDT','ARBUSDT','ASTERUSDT','AVAXUSDT','BABYUSDT',
+  'BANANAS31USDT','BIOUSDT','BNBUSDT','BTCUSDT','CHIPUSDT','DASHUSDT',
+  'DOGEUSDT','ENAUSDT','ETHUSDT','EURUSDT','FDUSDUSDT','FETUSDT',
+  'GIGGLEUSDT','LINKUSDT','LTCUSDT','LUNCUSDT','MEGAUSDT','ONDOUSDT',
+  'OPENUSDT','ORCAUSDT','ORDIUSDT','PARTIUSDT','PAXGUSDT','PENGUUSDT',
+  'PEPEUSDT','RLUSDUSDT','SOLUSDT','SUIUSDT','TAOUSDT','TONUSDT',
+  'TRXUSDT','TSTUSDT','UNIUSDT','WLFIUSDT','XAUTUSDT','XRPUSDT',
+  'XVGUSDT','ZECUSDT','ZENUSDT','ZKUSDT'
+];
+
+const DEFAULT_COIN = 'BTCUSDT';
+
 class TopBar extends HTMLElement {
   connectedCallback() {
+    const coinOptions = COINS.map(coin =>
+      `<div class="coin-option${coin === DEFAULT_COIN ? ' active' : ''}" data-value="${coin}">${coin}</div>`
+    ).join('');
+
     this.innerHTML = `
       <div class="filter-group">
       <span class="filter-label">Time Range:</span>
@@ -35,6 +52,16 @@ class TopBar extends HTMLElement {
               <div class="candlesize-option" data-value="24h">24 hours</div>
             </div>
           </div>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Coin:</span>
+        <div id="coin-picker">
+          <div id="coin-selected">BTCUSDT ▾</div>
+          <div id="coin-options">
+            ${coinOptions}
+          </div>
+        </div>
       </div>
     `;
   }
