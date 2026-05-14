@@ -10,15 +10,19 @@ const COINS = [
 ];
 
 const DEFAULT_COIN = 'BTCUSDT';
+const DEFAULT_COIN2 = 'ETHUSDT';
 
-class TopBar extends HTMLElement {
-  connectedCallback() {
-    const coinOptions = COINS.map(coin =>
+const coinOptions = COINS.map(coin =>
       `<div class="coin-option${coin === DEFAULT_COIN ? ' active' : ''}" data-value="${coin}">${coin}</div>`
     ).join('');
 
-    this.innerHTML = `
-      <div class="filter-group">
+const coinOptions2 = COINS.map(coin =>
+  `<div class="coin2-option${coin === DEFAULT_COIN2 ? ' active' : ''}" data-value="${coin}">${coin}</div>`
+).join('');
+
+
+const TIME_RANGE_FILTER_HTML = `
+    <div class="filter-group">
       <span class="filter-label">Time Range:</span>
         <div id="time-picker">
           <div id="time-selected">Last 15 minutes ▾</div>
@@ -35,8 +39,9 @@ class TopBar extends HTMLElement {
             <div class="time-option" data-value="now-14d">Last 14 days</div>
           </div>
         </div>
-      </div>
+    </div>`
 
+const CANDLE_SIZE_FILTER_HTML = `
       <div class="filter-group">
         <span class="filter-label">Candle Size:</span>
           <div id="candlesize-picker">
@@ -53,6 +58,14 @@ class TopBar extends HTMLElement {
             </div>
           </div>
       </div>
+`
+
+class TopBar extends HTMLElement {
+  connectedCallback() {
+    this.innerHTML = `
+      ${TIME_RANGE_FILTER_HTML}
+
+      ${CANDLE_SIZE_FILTER_HTML}
 
       <div class="filter-group">
         <span class="filter-label">Coin:</span>
@@ -67,3 +80,35 @@ class TopBar extends HTMLElement {
   }
 }
 customElements.define('custom-topbar', TopBar);
+
+
+class TopBar_forTwoCoinSelectors extends HTMLElement{
+  connectedCallback() {
+    this.innerHTML = `
+      ${TIME_RANGE_FILTER_HTML}
+
+      ${CANDLE_SIZE_FILTER_HTML}
+
+      <div class="filter-group">
+        <span class="filter-label">Coin 1:</span>
+        <div id="coin-picker">
+          <div id="coin-selected">BTCUSDT ▾</div>
+          <div id="coin-options">
+            ${coinOptions}
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Coin 2:</span>
+        <div id="coin2-picker">
+          <div id="coin2-selected">ETHUSDT ▾</div>
+          <div id="coin2-options">
+            ${coinOptions2}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+}
+customElements.define('custom-topbar-two-coins', TopBar_forTwoCoinSelectors);

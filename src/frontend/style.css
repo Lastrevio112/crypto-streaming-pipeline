@@ -119,14 +119,16 @@ html, body {
   display: flex;
   align-items: center;
   padding: 0 16px;
-  z-index: 99;
+  z-index: 200;
+  overflow:visible;
 }
 
-custom-topbar {
+custom-topbar, custom-topbar-two-coins {
   display: flex;       /* This makes the inner divs sit side-by-side */
   flex-direction: row; 
   align-items: center;
   gap: 12px;           /* Space between the two selectors */
+  position: relative;
 }
 
 #time-picker {
@@ -251,13 +253,13 @@ custom-topbar {
 
 
 
-#coin-picker {
+#coin-picker, #coin2-picker {
   position: relative;
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 13px;
 }
 
-#coin-selected {
+#coin-selected, #coin2-selected {
   padding: 6px 10px;
   color: #d4d9e3;
   font-size: 13px;
@@ -269,12 +271,12 @@ custom-topbar {
   white-space: nowrap;
 }
 
-#coin-selected:hover {
+#coin-selected:hover, #coin2-selected:hover {
   background: #2c3140;
   color: #fff;
 }
 
-#coin-options {
+#coin-options, #coin2-options {
   display: none;
   position: absolute;
   top: calc(100% + 4px);
@@ -288,38 +290,44 @@ custom-topbar {
   z-index: 200;
 }
 
-#coin-options.open { display: block; }
+#coin-options.open, #coin2-options.open { 
+  display: block; 
+}
 
-.coin-option {
+.coin-option, .coin2-option {
   padding: 8px 12px;
   color: #888;
   cursor: pointer;
   white-space: nowrap;
 }
 
-.coin-option:hover { color: #fff; background: #2a2d32; }
-.coin-option.active { color: #00e5ff; }
+.coin-option:hover, .coin2-option:hover { 
+  color: #fff; background: #2a2d32; 
+}
+.coin-option.active, .coin2-option.active { 
+  color: #00e5ff; 
+}
 
 
-#coin-options {
+#coin-options, #coin2-options {
   scrollbar-width: thin;                        /* Firefox */
   scrollbar-color: #2c3140 transparent;         /* Firefox: thumb track */
 }
 
-#coin-options::-webkit-scrollbar {
+#coin-options::-webkit-scrollbar, #coin2-options::-webkit-scrollbar {
   width: 6px;
 }
 
-#coin-options::-webkit-scrollbar-track {
+#coin-options::-webkit-scrollbar-track, #coin2-options::-webkit-scrollbar-track {
   background: transparent;
 }
 
-#coin-options::-webkit-scrollbar-thumb {
+#coin-options::-webkit-scrollbar-thumb, #coin2-options::-webkit-scrollbar-thumb {
   background: #2c3140;
   border-radius: 3px;
 }
 
-#coin-options::-webkit-scrollbar-thumb:hover {
+#coin-options::-webkit-scrollbar-thumb:hover, #coin2-options::-webkit-scrollbar-thumb:hover {
   background: #3d4459;
 }
 

@@ -11,7 +11,8 @@ const timeToMinutes = (str) => {
 const FilterState = {
   currentTimeRange: 'now-15m',
   currentCandleSize: '30s',
-  currentCoin: 'BTCUSDT'
+  currentCoin: 'BTCUSDT',
+  currentCoin2: 'ETHUSDT'
 };
 
 
@@ -220,7 +221,35 @@ class CoinSelector extends SelectableFilter {
 }
 
 
+class Coin2Selector extends SelectableFilter {
+  constructor() {
+    super({
+      selectedId: 'coin2-selected',
+      optionsId: 'coin2-options',
+      optionClassName: 'coin2-option',
+      pickerId: 'coin2-picker'
+    });
+
+    this.selectedEl.addEventListener('click', () => {
+      const active = this.optionsContainer.querySelector('.coin2-option.active');
+      if (active) active.scrollIntoView({ block: 'center' });
+    });
+  }
+
+  updateLogic(value) {
+    FilterState.currentCoin2 = value;
+    document.querySelectorAll('iframe').forEach(iframe => {
+      const url = new URL(iframe.src);
+      url.searchParams.set('var-coin_symbol_2', value);
+      iframe.src = url.toString();
+    });
+    return true;
+  }
+}
+
+
 // Initialize each class:
-new TimeSelector();
-new CandleSizeSelector();
-new CoinSelector();
+if (document.getElementById('time-selected'))      new TimeSelector();
+if (document.getElementById('candlesize-selected')) new CandleSizeSelector();
+if (document.getElementById('coin-selected'))      new CoinSelector();
+if (document.getElementById('coin2-selected'))     new Coin2Selector();
