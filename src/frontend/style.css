@@ -106,11 +106,13 @@ html, body {
 
 #sidebar:hover .label { opacity: 1; }
 
+
 #topbar {
   position: fixed;
   top: 0;
   left: 48px;
   right: 0;
+  gap: 8px;
   height: 40px;
   background: #141619;
   border-bottom: 1px solid #2a2d32;
@@ -118,6 +120,13 @@ html, body {
   align-items: center;
   padding: 0 16px;
   z-index: 99;
+}
+
+custom-topbar {
+  display: flex;       /* This makes the inner divs sit side-by-side */
+  flex-direction: row; 
+  align-items: center;
+  gap: 12px;           /* Space between the two selectors */
 }
 
 #time-picker {
@@ -172,6 +181,61 @@ html, body {
 .time-option.active { 
   color: #00e5ff; 
 }
+
+
+#candlesize-picker {
+  position: relative;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+}
+
+#candlesize-selected {
+  background: #22262b;
+  color: #ccc;
+  border: 1px solid #2a2d32;
+  padding: 5px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+#candlesize-selected:hover { 
+  color: #fff; 
+  border-color: #555; 
+}
+
+#candlesize-options {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: #1e2228;
+  border: 1px solid #2a2d32;
+  border-radius: 4px;
+  min-width: 160px;
+  z-index: 200;
+}
+
+#candlesize-options.open { 
+  display: block; 
+}
+
+.candlesize-option {
+  padding: 8px 12px;
+  color: #888;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.candlesize-option:hover { 
+  color: #fff; 
+  background: #2a2d32; 
+}
+
+.candlesize-option.active { 
+  color: #00e5ff; 
+}
+
 
 iframe {
   display: block;
