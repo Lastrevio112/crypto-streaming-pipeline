@@ -5,7 +5,6 @@ selected.addEventListener('click', function() {
   options.classList.toggle('open');
 });
 
-// Function that listens for changes in the time filter:
 document.querySelectorAll('.time-option').forEach(function(option) {
   option.addEventListener('click', function() {
     const from = this.dataset.value;
