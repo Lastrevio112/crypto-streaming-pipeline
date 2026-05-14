@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coin Comparison Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── Sidebar ── -->
+  <aside id="sidebar">
+    <div class="sidebar-logo">
+      <!-- simple bolt icon -->
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+      </svg>
+      <span class="label">CryptoStream</span>
+    </div>
+    <nav>
+      <a href="index.html" class="active">
+        <svg viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg>
+        <span class="nav-label">Price Evolution</span>
+      </a>
+      <a href="dashboard2.html">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span class="nav-label">Volume Analysis</span>
+      </a>
+      <a href="dashboard3.html">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span class="nav-label">Signal Analysis</span>
+      </a>
+      <a href="dashboard4.html">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        <span class="nav-label">Coin Comparison</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ── Main layout ── -->
+  <div id="layout">
+    <div id="main">
+
+      <!-- Header -->
+      <div id="header">
+        <h1>Price Evolution</h1>
+        <div id="coin-selector">
+          <label>SYMBOL</label>
+          <select id="coin-select"></select>
+        </div>
+      </div>
+
+      <!-- Grafana iframe -->
+      <div id="dashboard-area">
+        <iframe
+          class="grafana-frame"
+          src="/grafana/d/ad2fplb/price-evolution?orgId=1&refresh=2s&kiosk&var-coin_symbol=BTC"
+          allowfullscreen>
+        </iframe>
+      </div>
+
+    </div>
+
+    <!-- Live log panel -->
+    <div id="log-panel">
+      <div id="log-header">
+        <div class="live-dot"></div>
+        <span>Live Trades</span>
+        <button id="log-toggle" aria-label="Close log">
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+      <div id="log-entries"></div>
+    </div>
+  </div>
+
+  <!-- Re-open button when log is collapsed -->
+  <button id="log-open-btn" aria-label="Open log">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+
+  <script src="app.js"></script>
+</body>
+</html>

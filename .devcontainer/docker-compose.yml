@@ -266,7 +266,7 @@ services:
       - ../nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ../nginx/cache:/var/cache/nginx
       - ../certs:/etc/nginx/certs:ro        # my Let's Encrypt certs
-      - ../frontend:/usr/share/nginx/html:ro # my static HTML/JS files
+      - ../src/frontend:/usr/share/nginx/html:ro # my static HTML/JS files
     depends_on:
       - fastapi
       - grafana
