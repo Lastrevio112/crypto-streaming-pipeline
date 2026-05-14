@@ -14,7 +14,9 @@ class SideBar extends HTMLElement {
       { href: "dashboard4.html", icon: "⚖️", label: "Coin Comparison" }
     ];
 
-    this.innerHTML = links.map((link, index) => `
+    const header = `<span class="sidebar-section-label">Dashboards:</span>`;
+
+    this.innerHTML = header + links.map((link, index) => `
       <a href="${link.href}" class="${this.activeIndex === index ? 'active' : ''}">
         <span class="icon">${link.icon}</span>
         <span class="label">${link.label}</span>
