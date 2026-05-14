@@ -75,7 +75,8 @@ html, body {
   border-right: 1px solid #2a2d32;
   overflow: hidden;
   transition: width 0.2s ease;
-  z-index: 100;
+  z-index: 200;
+  padding-top: 40px; /* so that it doesn't overlap with the topbar*/
 }
 
 #sidebar:hover { width: 180px; }
@@ -107,6 +108,7 @@ html, body {
 #sidebar:hover .label { opacity: 1; }
 
 
+
 #topbar {
   position: fixed;
   top: 0;
@@ -119,7 +121,7 @@ html, body {
   display: flex;
   align-items: center;
   padding: 0 16px;
-  z-index: 200;
+  z-index: 199;
   overflow:visible;
 }
 
@@ -146,7 +148,7 @@ custom-topbar, custom-topbar-two-coins {
   border: 1px solid #2a2d32;
   border-radius: 4px;
   min-width: 160px;
-  z-index: 200;
+  z-index: 99;
 }
 
 #time-options.open { 
