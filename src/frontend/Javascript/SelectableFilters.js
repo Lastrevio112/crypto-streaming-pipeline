@@ -81,19 +81,27 @@ class SelectableFilter {
     const timeMins = timeToMinutes(timeRange);
     const candleMins = timeToMinutes(candleSize);
 
-    // Rule 4: 7 days (10080m) -> 30m candle
+    // 7 days (10080m) -> 30m candle
     if (timeMins >= 10080 && candleMins < 30) 
       return false;
 
-    // Rule 3: 2 days (2880m) -> 5m candle
+    // 2 days (2880m) -> 5m candle
     if (timeMins >= 2880 && candleMins < 5) 
       return false;
 
-    // Rule 2: 24h (1440m) -> 1m candle
+    // 24h (1440m) -> 1m candle
     if (timeMins >= 1440 && candleMins < 1) 
       return false;
 
-    // Rule 1: 30m -> 30s (0.5m) candle
+    // 12h (720m) -> 5m candle
+    if (timeMins >= 720 && candleMins < 5)
+      return false;
+
+    // 4h (240m) -> 1m candle
+    if (timeMins >= 240 && candleMins < 1)
+      return false;
+
+    // 30m -> 30s (0.5m) candle
     if (timeMins >= 30 && candleMins < 0.5) 
       return false;
 
