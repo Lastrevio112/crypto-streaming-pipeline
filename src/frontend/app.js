@@ -22,6 +22,7 @@ document.querySelectorAll('.time-option').forEach(function(option) {
     url.searchParams.set('from', from);
     url.searchParams.set('to', 'now');
     url.searchParams.set('kiosk', 'true');
+    url.searchParams.set('inactive', '1');
     iframe.src = url.toString();
   });
 });
