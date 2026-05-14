@@ -246,3 +246,40 @@ iframe {
   background: #141619; /* Match Grafana background while loading */
 }
 
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+#candle-error-popup {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+
+  background: #1a1d21;
+  border: 1px solid #f59e0b;
+  border-left: 3px solid #f59e0b;
+  color: #f59e0b;
+
+  padding: 10px 16px;
+  border-radius: 4px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+
+  font-family: Inter, 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+
+  align-items: center;
+  gap: 8px;
+}
+
+#candle-error-popup.visible {
+  display: flex;
+  animation: slideDown 0.18s ease-out forwards;
+}

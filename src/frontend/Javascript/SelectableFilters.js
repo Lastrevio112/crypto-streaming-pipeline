@@ -55,10 +55,16 @@ class SelectableFilter {
   }
 
   createErrorPopup() {
+    // Inject keyframe animation once
     const popup = document.createElement('div');
     popup.id = 'candle-error-popup';
-    popup.textContent = "Please choose a higher candle size!";
-    popup.style = "display:none; position:fixed; top:20px; left:50%; transform:translateX(-50%); background: #ff4d4d; color: white; padding: 10px 20px; border-radius: 5px; z-index: 1000; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);";
+    popup.innerHTML = `
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <span>Candle size too small for this time range</span>
+    `;
     document.body.appendChild(popup);
     return popup;
   }
@@ -129,12 +135,12 @@ class TimeSelector extends SelectableFilter {
   // Overriding the parent logic to update IFrame URL based on time selection:
   updateLogic(value) {
     if (!super.validate(value, FilterState.currentCandleSize)) {
-      this.errorPopup.style.display = 'block';
+      this.errorPopup.classList.add('visible');
       return false; // Stop the update
     }
 
     // If valid, hide popup and update iframes
-    this.errorPopup.style.display = 'none';
+    this.errorPopup.classList.remove('visible');
     FilterState.currentTimeRange = value; 
 
     document.querySelectorAll('iframe').forEach(iframe => {
@@ -164,12 +170,12 @@ class CandleSizeSelector extends SelectableFilter {
 
   updateLogic(value) {
     if (!super.validate(FilterState.currentTimeRange, value)) {
-      this.errorPopup.style.display = 'block';
+      this.errorPopup.classList.add('visible');
       return false; // Stop the update
     }
 
     // If valid, hide popup and update iframes
-    this.errorPopup.style.display = 'none';
+    this.errorPopup.classList.remove('visible');
     FilterState.currentCandleSize = value;
 
     document.querySelectorAll('iframe').forEach(iframe => {
