@@ -6,8 +6,29 @@
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
+  <div id="sidebar">
+    <a href="index.html" class="active"><span class="icon">📈</span><span class="label">Price Evolution</span></a>
+    <a href="dashboard2.html"><span class="icon">📊</span><span class="label">Volume Analysis</span></a>
+    <a href="dashboard3.html"><span class="icon">⚡</span><span class="label">Singal Analysis</span></a>
+    <a href="dashboard4.html"><span class="icon">⚖️</span><span class="label">Coin Comparison</span></a>
+  </div>
+   <div id="topbar">
+    <select id="time-picker">
+      <option value="now-5m">Last 5 minutes</option>
+      <option value="now-15m" selected>Last 15 minutes</option>
+      <option value="now-30m">Last 30 minutes</option>
+      <option value="now-1h">Last 1 hour</option>
+      <option value="now-4h">Last 4 hours</option>
+      <option value="now-12h">Last 12 hours</option>
+      <option value="now-24h">Last 24 hours</option>
+      <option value="now-2d">Last 2 days</option>
+      <option value="now-7d">Last 7 days</option>
+      <option value="now-14d">Last 14 days</option>
+    </select>
+  </div>
   <iframe src="http://localhost:3000/d/adw9btb/price-evolution-analysis?orgId=1&kiosk">
   </iframe>
+  <script src="app.js"></script>
 </body>
 </html>
 
