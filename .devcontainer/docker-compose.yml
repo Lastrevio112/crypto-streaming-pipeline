@@ -231,6 +231,45 @@ services:
     networks:
       - crypto-network
 
+  fastapi:
+    container_name: crypto-fastapi
+    platform: linux/arm64
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile.fastapi
+    environment:
+      - PYTHONPATH=/workspace
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    env_file:
+      - ../.env
+    volumes:
+      - ..:/workspace
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - crypto-network
+
+  nginx:
+    container_name: crypto-nginx
+    image: nginx:alpine
+    platform: linux/arm64
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../nginx/cache:/var/cache/nginx
+      - ../certs:/etc/nginx/certs:ro        # my Let's Encrypt certs
+      - ../frontend:/usr/share/nginx/html:ro # my static HTML/JS files
+    depends_on:
+      - fastapi
+      - grafana
+    restart: unless-stopped
+    networks:
+      - crypto-network
+
 networks:
   crypto-network:
     driver: bridge
