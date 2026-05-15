@@ -75,7 +75,7 @@ const SLIDING_WINDOW_FILTER_HTML = `
 `
 
 MESSAGE_LOG_BUTTON_HTML = `
-  <button id="feed-toggle-btn" aria-label="Toggle live feed">
+  <button id="feed-toggle-btn" aria-label="Toggle live feed" title="This is absolutely useless for traders, but I added it just to brag that I stream data in real time.">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
       <rect x="1" y="2" width="9" height="2" rx="1" fill="currentColor"/>
       <rect x="1" y="7" width="9" height="2" rx="1" fill="currentColor"/>
