@@ -2,44 +2,68 @@ class MessageLog {
   constructor() {
     this.sidebar  = document.getElementById('messagelog');
     this.dashboard = document.getElementById('dashboard');
-    this.toggleBtn = document.getElementById('feed-toggle-btn');
     this.closeBtn  = document.getElementById('messagelog-close');
     this.feed      = document.getElementById('message-feed');
+    
+    // These will be assigned inside initEventListeners()
+    this.toggleBtn = null; 
     this.isOpen    = false;
     this.autoScroll = true;
 
-    this.toggleBtn.addEventListener('click', () => this.toggle());
-    this.closeBtn.addEventListener('click',  () => this.close());
+    // Handle close button click (which is static in HTML)
+    if (this.closeBtn) {
+      this.closeBtn.addEventListener('click', () => this.close());
+    }
 
     // Pause auto-scroll when user manually scrolls up
-    this.feed.addEventListener('scroll', () => {
-      const { scrollTop, scrollHeight, clientHeight } = this.feed;
-      this.autoScroll = scrollHeight - scrollTop - clientHeight < 40;
+    if (this.feed) {
+      this.feed.addEventListener('scroll', () => {
+        const { scrollTop, scrollHeight, clientHeight } = this.feed;
+        this.autoScroll = scrollHeight - scrollTop - clientHeight < 40;
+      });
+    }
+
+    // Wait for custom elements to mount, then bind the dynamic toggle button
+    window.addEventListener('DOMContentLoaded', () => {
+      this.initEventListeners();
     });
+  }
+
+  initEventListeners() {
+    this.toggleBtn = document.getElementById('feed-toggle-btn');
+    if (this.toggleBtn) {
+      this.toggleBtn.addEventListener('click', () => this.toggle());
+    } else {
+      console.warn("Feed toggle button not found in DOM yet. Retrying shortly...");
+      // Fail-safe fallback if DOMContentLoaded fires too early for custom component parsing
+      setTimeout(() => {
+        this.toggleBtn = document.getElementById('feed-toggle-btn');
+        if (this.toggleBtn) this.toggleBtn.addEventListener('click', () => this.toggle());
+      }, 200);
+    }
   }
 
   open() {
     this.isOpen = true;
-    this.sidebar.classList.add('open');
-    this.dashboard.classList.add('feed-open');
-    this.toggleBtn.classList.add('active');
+    if (this.sidebar) this.sidebar.classList.add('open');
+    if (this.dashboard) this.dashboard.classList.add('feed-open');
+    if (this.toggleBtn) this.toggleBtn.classList.add('active');
   }
 
   close() {
     this.isOpen = false;
-    this.sidebar.classList.remove('open');
-    this.dashboard.classList.remove('feed-open');
-    this.toggleBtn.classList.remove('active');
+    if (this.sidebar) this.sidebar.classList.remove('open');
+    if (this.dashboard) this.dashboard.classList.remove('feed-open');
+    if (this.toggleBtn) this.toggleBtn.classList.remove('active');
   }
 
   toggle() {
     this.isOpen ? this.close() : this.open();
   }
 
-  // Call this to inject a message from your WebSocket handler
-  // topic: string (e.g. 'trades', 'prices')
-  // body:  string (the message content to display)
   addMessage(topic, body) {
+    if (!this.feed) return;
+
     const now = new Date();
     const time = now.toLocaleTimeString('en-GB', { hour12: false });
 
