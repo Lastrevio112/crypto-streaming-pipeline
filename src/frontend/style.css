@@ -143,7 +143,7 @@ html, body {
   overflow:visible;
 }
 
-custom-topbar, custom-topbar-two-coins {
+custom-topbar, custom-topbar-two-coins, custom-topbar-sliding-windows {
   display: flex;       /* This makes the inner divs sit side-by-side */
   flex-direction: row; 
   align-items: center;
@@ -151,13 +151,13 @@ custom-topbar, custom-topbar-two-coins {
   position: relative;
 }
 
-#time-picker {
+#time-picker, #sliding-picker {
   position: relative;
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 13px;
 }
 
-#time-options {
+#time-options, #sliding-options {
   display: none;
   position: absolute;
   top: calc(100% + 4px);
@@ -169,23 +169,23 @@ custom-topbar, custom-topbar-two-coins {
   z-index: 99;
 }
 
-#time-options.open { 
+#time-options.open, #sliding-options.open { 
   display: block; 
 }
 
-.time-option {
+.time-option, .sliding-option {
   padding: 8px 12px;
   color: #888;
   cursor: pointer;
   white-space: nowrap;
 }
 
-.time-option:hover { 
+.time-option:hover, .sliding-option:hover { 
   color: #fff; 
   background: #2a2d32; 
 }
 
-.time-option.active { 
+.time-option.active, .sliding-option.active { 
   color: #00e5ff; 
 }
 
@@ -197,7 +197,8 @@ custom-topbar, custom-topbar-two-coins {
 }
 
 #time-selected,
-#candlesize-selected {
+#candlesize-selected,
+#sliding-selected {
   padding: 6px 10px;
   color: #d4d9e3;
   font-size: 13px;
@@ -210,7 +211,8 @@ custom-topbar, custom-topbar-two-coins {
 }
 
 #time-selected:hover,
-#candlesize-selected:hover {
+#candlesize-selected:hover,
+#sliding-selected:hover {
   background: #2c3140;
   color: #fff;
 }

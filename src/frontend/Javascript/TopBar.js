@@ -60,6 +60,20 @@ const CANDLE_SIZE_FILTER_HTML = `
       </div>
 `
 
+const SLIDING_WINDOW_FILTER_HTML = `
+      <div class="filter-group">
+        <span class="filter-label">Sliding Window:</span>
+          <div id="sliding-picker">
+            <div id="sliding-selected">1m (5s hop) ▾</div>
+            <div id="sliding-options">
+              <div class="sliding-option" data-value="1s">5s (1s hop)</div>
+              <div class="sliding-option active" data-value="30s">1m (5s hop)</div>
+              <div class="sliding-option" data-value="1m">5m (30s hop)</div>
+            </div>
+          </div>
+      </div>
+`
+
 class TopBar extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
@@ -81,6 +95,27 @@ class TopBar extends HTMLElement {
 }
 customElements.define('custom-topbar', TopBar);
 
+
+class TopBar_forSlidingWindows extends HTMLElement{
+  connectedCallback() {
+    this.innerHTML = `
+      ${TIME_RANGE_FILTER_HTML}
+
+      ${SLIDING_WINDOW_FILTER_HTML}
+
+      <div class="filter-group">
+        <span class="filter-label">Coin:</span>
+        <div id="coin-picker">
+          <div id="coin-selected">BTCUSDT ▾</div>
+          <div id="coin-options">
+            ${coinOptions}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+}
+customElements.define('custom-topbar-sliding-windows', TopBar_forSlidingWindows);
 
 class TopBar_forTwoCoinSelectors extends HTMLElement{
   connectedCallback() {
@@ -112,3 +147,4 @@ class TopBar_forTwoCoinSelectors extends HTMLElement{
   }
 }
 customElements.define('custom-topbar-two-coins', TopBar_forTwoCoinSelectors);
+

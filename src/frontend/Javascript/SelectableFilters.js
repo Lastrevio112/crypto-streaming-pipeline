@@ -12,8 +12,66 @@ const FilterState = {
   currentTimeRange: 'now-15m',
   currentCandleSize: '30s',
   currentCoin: 'BTCUSDT',
-  currentCoin2: 'ETHUSDT'
+  currentCoin2: 'ETHUSDT',
+  currentSlidingWindow: '1m (5s hop)'
 };
+
+
+// Function to validate the candle size selection based on the current value of the time selection.
+// We implement this to make sure that for large time selection, we don't select very small candle sizes that will make the app slow (ex: 24h time with 1s candle is a horrible combination).
+const validateCandleSize = (timeRange, candleSize) => {
+  const timeMins = timeToMinutes(timeRange);
+  const candleMins = timeToMinutes(candleSize);
+
+  // 7 days (10080m) -> 30m candle
+  if (timeMins >= 10080 && candleMins < 30) 
+    return false;
+
+  // 2 days (2880m) -> 5m candle
+  if (timeMins >= 2880 && candleMins < 5) 
+    return false;
+
+  // 24h (1440m) -> 1m candle
+  if (timeMins >= 1440 && candleMins < 1) 
+    return false;
+
+  // 12h (720m) -> 5m candle
+  if (timeMins >= 720 && candleMins < 5)
+    return false;
+
+  // 4h (240m) -> 1m candle
+  if (timeMins >= 240 && candleMins < 1)
+    return false;
+
+  // 30m -> 30s (0.5m) candle
+  if (timeMins >= 30 && candleMins < 0.5) 
+    return false;
+
+  return true;
+}
+
+const validateSlidingWindow = (timeRange, slidingWindowSize) => {
+  const timeMins = timeToMinutes(timeRange);
+  const windowSeconds = { '1s': 5, '30s': 60, '1m': 300 }[slidingWindowSize] ?? 0;
+
+  console.log("timeMins: ", timeMins, "windowSeconds: ", windowSeconds)
+
+  // 12h (720m) -> 5m sliding window
+  if (timeMins >= 720 && windowSeconds < 300){
+    //console.log("rule 1")
+    return false;
+  }
+      
+
+  // 30m -> 1m sliding window
+  if (timeMins >= 60 && windowSeconds < 60){
+    //console.log("rule 2")
+    return false;
+  }
+      
+  return true;
+}
+
 
 
 class SelectableFilter {
@@ -83,39 +141,6 @@ class SelectableFilter {
     this.optionsContainer.classList.remove('open');
   }
 
-  // Function to validate the candle size selection based on the current value of the time selection.
-  // We implement this to make sure that for large time selection, we don't select very small candle sizes that will make the app slow (ex: 24h time with 1s candle is a horrible combination).
-  validate(timeRange, candleSize){
-    const timeMins = timeToMinutes(timeRange);
-    const candleMins = timeToMinutes(candleSize);
-
-    // 7 days (10080m) -> 30m candle
-    if (timeMins >= 10080 && candleMins < 30) 
-      return false;
-
-    // 2 days (2880m) -> 5m candle
-    if (timeMins >= 2880 && candleMins < 5) 
-      return false;
-
-    // 24h (1440m) -> 1m candle
-    if (timeMins >= 1440 && candleMins < 1) 
-      return false;
-
-    // 12h (720m) -> 5m candle
-    if (timeMins >= 720 && candleMins < 5)
-      return false;
-
-    // 4h (240m) -> 1m candle
-    if (timeMins >= 240 && candleMins < 1)
-      return false;
-
-    // 30m -> 30s (0.5m) candle
-    if (timeMins >= 30 && candleMins < 0.5) 
-      return false;
-
-    return true;
-  }
-
   // Placeholder to be overwritten by child classes
   updateLogic(value) {
     console.warn("updateLogic() not implemented for this filter.");
@@ -136,9 +161,16 @@ class TimeSelector extends SelectableFilter {
 
   // Overriding the parent logic to update IFrame URL based on time selection:
   updateLogic(value) {
-    if (!super.validate(value, FilterState.currentCandleSize)) {
+    const hasCandlePicker = !!document.getElementById('candlesize-selected');
+    const hasSlidingPicker = !!document.getElementById('sliding-selected');
+
+    const isValid = hasCandlePicker
+      ? validateCandleSize(value, FilterState.currentCandleSize)
+      : validateSlidingWindow(value, FilterState.currentSlidingWindow);
+
+    if (!isValid) {
       this.errorPopup.classList.add('visible');
-      return false; // Stop the update
+      return false;
     }
 
     // If valid, hide popup and update iframes
@@ -158,7 +190,6 @@ class TimeSelector extends SelectableFilter {
 }
 
 
-
 class CandleSizeSelector extends SelectableFilter {
   constructor() {
     super({
@@ -169,9 +200,8 @@ class CandleSizeSelector extends SelectableFilter {
     });
   }
 
-
   updateLogic(value) {
-    if (!super.validate(FilterState.currentTimeRange, value)) {
+    if (!validateCandleSize(FilterState.currentTimeRange, value)) {
       this.errorPopup.classList.add('visible');
       return false; // Stop the update
     }
@@ -248,8 +278,53 @@ class Coin2Selector extends SelectableFilter {
 }
 
 
+class SlidingWindowFilter extends SelectableFilter{
+  constructor() {
+    super({
+      selectedId: 'sliding-selected',
+      optionsId: 'sliding-options',
+      optionClassName: 'sliding-option',
+      pickerId: 'sliding-picker'
+    });
+
+    this.selectedEl.addEventListener('click', () => {
+      const active = this.optionsContainer.querySelector('.sliding-option.active');
+      if (active) active.scrollIntoView({ block: 'center' });
+    });
+  }
+
+  updateLogic(value) {
+    if (!validateSlidingWindow(FilterState.currentTimeRange, value)) {
+      this.errorPopup.classList.add('visible');
+      return false; // Stop the update
+    }
+
+    // If valid, hide popup and update iframes
+    this.errorPopup.classList.remove('visible');
+    FilterState.currentSlidingWindow = value;
+
+    const grafanaValueMap = {
+      '1s':  'analytics_5s_sliding',
+      '30s': 'analytics_1m_sliding',
+      '1m':  'analytics_5m_sliding',
+    };
+
+    const grafanaValue = grafanaValueMap[value] ?? value;
+
+    document.querySelectorAll('iframe').forEach(iframe => {
+      const url = new URL(iframe.src);
+      url.searchParams.set('var-sliding_window', grafanaValue);
+      iframe.src = url.toString();
+    });
+
+    return true;
+  }
+}
+
+
 // Initialize each class:
-if (document.getElementById('time-selected'))      new TimeSelector();
+if (document.getElementById('time-selected'))       new TimeSelector();
 if (document.getElementById('candlesize-selected')) new CandleSizeSelector();
-if (document.getElementById('coin-selected'))      new CoinSelector();
-if (document.getElementById('coin2-selected'))     new Coin2Selector();
+if (document.getElementById('coin-selected'))       new CoinSelector();
+if (document.getElementById('coin2-selected'))      new Coin2Selector();
+if (document.getElementById('sliding-selected'))    new SlidingWindowFilter();

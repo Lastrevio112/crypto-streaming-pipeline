@@ -24,7 +24,7 @@ SELECT
     formatReadableSize(sum(size_in_bytes)) AS disk_size_added,
     sum(rows) AS rows_added
 FROM system.part_log
-WHERE table = 'src_5s_sliding'
+WHERE table IN ('src_5s_sliding', 'src_1m_sliding', 'src_5m_sliding', 'src_1s_tumbling')
   AND event_type = 'NewPart' -- Only count initial writes, not merges
   AND event_time > now() - INTERVAL 2 HOUR
 GROUP BY hour
