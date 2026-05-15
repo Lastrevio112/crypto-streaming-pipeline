@@ -200,13 +200,26 @@ html, body {
   overflow:visible;
 }
 
-custom-topbar, custom-topbar-two-coins, custom-topbar-sliding-windows {
-  display: flex;       /* This makes the inner divs sit side-by-side */
+custom-topbar, 
+custom-topbar-two-coins, 
+custom-topbar-sliding-windows {
+  display: flex !important;       
   flex-direction: row; 
   align-items: center;
-  gap: 12px;           /* Space between the two selectors */
+  justify-content: flex-start; /* Ensures items layout left-to-right natively */
+  gap: 12px;           
   position: relative;
-  width: 100%;
+  width: 100%;                /* Forces the web component wrapper to take up the full topbar space */
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  background: #1e2128;
+  border: 1px solid #2c3140;
+  border-radius: 6px;
+  overflow: visible;
+  flex-shrink: 0;            /* Prevents filters from aggressively expanding and pushing the button out of bounds */
 }
 
 #time-picker, #sliding-picker {

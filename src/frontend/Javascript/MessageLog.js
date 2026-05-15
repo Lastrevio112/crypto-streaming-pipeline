@@ -5,12 +5,11 @@ class MessageLog {
     this.closeBtn  = document.getElementById('messagelog-close');
     this.feed      = document.getElementById('message-feed');
     
-    // These will be assigned inside initEventListeners()
     this.toggleBtn = null; 
     this.isOpen    = false;
     this.autoScroll = true;
 
-    // Handle close button click (which is static in HTML)
+    // Handle close button click (statically present in HTML)
     if (this.closeBtn) {
       this.closeBtn.addEventListener('click', () => this.close());
     }
@@ -23,23 +22,43 @@ class MessageLog {
       });
     }
 
-    // Wait for custom elements to mount, then bind the dynamic toggle button
-    window.addEventListener('DOMContentLoaded', () => {
-      this.initEventListeners();
+    // Watch the DOM dynamically to capture the button whenever it drops in
+    this.observeTopbarInjections();
+  }
+
+  observeTopbarInjections() {
+    // 1. Try to find it immediately (in case it already processed)
+    this.bindToggleButton();
+
+    if (this.toggleBtn) return;
+
+    // 2. Otherwise, watch #topbar for when the Custom Elements complete render
+    const topbarContainer = document.getElementById('topbar');
+    if (!topbarContainer) return;
+
+    const observer = new MutationObserver((mutations, obs) => {
+      this.bindToggleButton();
+      if (this.toggleBtn) {
+        obs.disconnect(); // Stop watching once found and bound
+      }
+    });
+
+    observer.observe(topbarContainer, {
+      childList: true,
+      subtree: true
     });
   }
 
-  initEventListeners() {
+  bindToggleButton() {
     this.toggleBtn = document.getElementById('feed-toggle-btn');
-    if (this.toggleBtn) {
+    if (this.toggleBtn && !this.toggleBtn.dataset.bound) {
       this.toggleBtn.addEventListener('click', () => this.toggle());
-    } else {
-      console.warn("Feed toggle button not found in DOM yet. Retrying shortly...");
-      // Fail-safe fallback if DOMContentLoaded fires too early for custom component parsing
-      setTimeout(() => {
-        this.toggleBtn = document.getElementById('feed-toggle-btn');
-        if (this.toggleBtn) this.toggleBtn.addEventListener('click', () => this.toggle());
-      }, 200);
+      this.toggleBtn.dataset.bound = "true"; // Flag to prevent double binding
+
+      // If the sidebar happens to already be open, sync button UI state
+      if (this.isOpen) {
+        this.toggleBtn.classList.add('active');
+      }
     }
   }
 
