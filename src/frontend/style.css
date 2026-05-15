@@ -37,12 +37,32 @@ html, body {
   margin-bottom: 4px;
 }
 
+.statistics {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  flex: 1;
+  min-width: 0; /* prevents flex children from overflowing */
+  height: 300px;
+}
 
 .chart-wrapper {
   position: relative; 
   width: 100%;
   height: 500px;      
   margin-bottom: 20px;
+}
+
+.chart-wrapper-stats {
+  position: relative; 
+  width: 100%;
+  height: 275px;      
+}
+
+.chart-wrapper-stats iframe {
+  width: 100%;
+  height: 100%;       
+  display: block;
 }
 
 .chart-wrapper:last-of-type {
