@@ -61,7 +61,6 @@ const validateSlidingWindow = (timeRange, slidingWindowSize) => {
     //console.log("rule 1")
     return false;
   }
-      
 
   // 30m -> 1m sliding window
   if (timeMins >= 60 && windowSeconds < 60){
