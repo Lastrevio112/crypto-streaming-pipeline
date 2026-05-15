@@ -74,6 +74,18 @@ const SLIDING_WINDOW_FILTER_HTML = `
       </div>
 `
 
+MESSAGE_LOG_BUTTON_HTML = `
+  <button id="feed-toggle-btn" aria-label="Toggle live feed">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <rect x="1" y="2" width="9" height="2" rx="1" fill="currentColor"/>
+      <rect x="1" y="7" width="9" height="2" rx="1" fill="currentColor"/>
+      <rect x="1" y="12" width="9" height="2" rx="1" fill="currentColor"/>
+      <circle cx="13" cy="3" r="2" fill="#00e5ff"/>
+    </svg>
+    Feed
+  </button>
+`
+
 class TopBar extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
@@ -90,6 +102,8 @@ class TopBar extends HTMLElement {
           </div>
         </div>
       </div>
+
+      ${MESSAGE_LOG_BUTTON_HTML}
     `;
   }
 }
@@ -112,6 +126,8 @@ class TopBar_forSlidingWindows extends HTMLElement{
           </div>
         </div>
       </div>
+
+      ${MESSAGE_LOG_BUTTON_HTML}
     `;
   }
 }
@@ -143,6 +159,8 @@ class TopBar_forTwoCoinSelectors extends HTMLElement{
           </div>
         </div>
       </div>
+
+      ${MESSAGE_LOG_BUTTON_HTML}
     `;
   }
 }

@@ -16,6 +16,19 @@
     <custom-topbar></custom-topbar>
   </div>
 
+  <!-- Right Sidebar -->
+  <div id="messagelog" class="messagelog-closed">
+    <div id="messagelog-header">
+      <span class="messagelog-title">Live Feed</span>
+      <button id="messagelog-close" aria-label="Close feed">✕</button>
+    </div>
+    <div id="message-feed">
+      <!-- Messages will be injected here -->
+    </div>
+  </div>
+
+  
+
   <div id="dashboard">
     <!-- Each chart goes under here: -->
     <div class="chart-wrapper">
@@ -44,6 +57,7 @@
     </div>
   </div>
 
+  <script src="Javascript/MessageLog.js"></script>
   <script src="Javascript/TopBar.js"></script>
   <script src="Javascript/SideBar.js"></script>
   <script src="Javascript/Disclaimer.js"></script>
