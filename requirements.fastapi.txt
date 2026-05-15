@@ -2,3 +2,4 @@ fastapi
 uvicorn[standard]
 aiokafka        # async Kafka consumer for the WebSocket feed
 python-dotenv
+confluent-kafka[schemaregistry]

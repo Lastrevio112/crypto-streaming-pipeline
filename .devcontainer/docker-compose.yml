@@ -241,6 +241,8 @@ services:
     build:
       context: ..
       dockerfile: .devcontainer/Dockerfile.fastapi
+    ports:
+      - "8000:8000"
     environment:
       - PYTHONPATH=/workspace
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
@@ -251,6 +253,9 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+      schema-registry:
+        condition: service_healthy
+    command: uvicorn src.fastapi.messagelog:app --host 0.0.0.0 --port 8000 --reload
     restart: unless-stopped
     networks:
       - crypto-network
