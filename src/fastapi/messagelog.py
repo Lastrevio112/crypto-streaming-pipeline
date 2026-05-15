@@ -6,8 +6,10 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from aiokafka import AIOKafkaConsumer
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroDeserializer
+from confluent_kafka.serialization import SerializationContext, MessageField
 import os
 import json
+import uuid
 
 app = FastAPI()
 
@@ -25,17 +27,23 @@ with open(str(os.environ.get("TOP_50_COINS_FILE_PATH")), "r") as f:
 
 # Initialize Schema Registry and Avro Deserializer
 sr_client = SchemaRegistryClient({"url": SCHEMA_REGISTRY_URL})
-avro_deserializer = AvroDeserializer(sr_client)
+avro_deserializer = AvroDeserializer(sr_client, schema_str=None)
 
 # Thread pool executor to offload the synchronous CPU-bound Avro deserialization
 executor = ThreadPoolExecutor(max_workers=4)
 
-def deserialize_avro(data):
-    """Synchronous helper function to decode Avro bytes."""
+"""Synchronous helper functions to decode Avro bytes."""
+def deserialize_avro_value(data):
     if data is None:
         return None
-    # Context is None here because schema is implicitly linked within the payload
-    return avro_deserializer(data, context=None)
+    ctx = SerializationContext(TOPIC_NAME, MessageField.VALUE)
+    return avro_deserializer(data, ctx)
+
+def deserialize_avro_key(data):
+    if data is None:
+        return None
+    ctx = SerializationContext(TOPIC_NAME, MessageField.KEY)
+    return avro_deserializer(data, ctx)
 
 @app.websocket("/ws/trades/{symbol}")
 async def websocket_endpoint(websocket: WebSocket, symbol: str):
@@ -45,30 +53,40 @@ async def websocket_endpoint(websocket: WebSocket, symbol: str):
         return
 
     await websocket.accept()
+
+    # Generate a unique group_id for every single WebSocket connection
+    unique_group_id = f"websocket-consumer-{symbol}-{uuid.uuid4()}"
     
     # Initialize a dedicated Kafka consumer per WebSocket connection for isolated filtering
     consumer = AIOKafkaConsumer(
         TOPIC_NAME,
         bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
-        auto_offset_reset="latest" # Matches your Flink configuration
+        auto_offset_reset="latest",
+        group_id=unique_group_id,
+        enable_auto_commit=True
     )
     
     await consumer.start()
+    print(f"Kafka consumer started for group: {unique_group_id}")
     
     try:
         # Loop over the incoming Kafka stream asynchronously
         async for msg in consumer:
             # Safely parse the Avro value using a threadpool to prevent event loop lag
             loop = asyncio.get_running_loop()
-            parsed_value = await loop.run_in_executor(executor, deserialize_avro, msg.value)
+            parsed_value = await loop.run_in_executor(executor, deserialize_avro_value, msg.value)
+            parsed_key = await loop.run_in_executor(executor, deserialize_avro_key, msg.key)
             
             if parsed_value is None:
                 continue
+
+            actual_key = parsed_key
+            if isinstance(parsed_key, dict):
+                actual_key = parsed_key.get("coin_symbol")
+
+            print(f"[DEBUG] Key Data: {parsed_key} | Value Data: {parsed_value}", flush=True)
             
-            # Extract symbol and check against endpoint path parameter
-            coin_symbol = parsed_value.get("coin_symbol")
-            
-            if coin_symbol == symbol:
+            if actual_key == symbol:
                 await websocket.send_json(parsed_value)
                 
     except WebSocketDisconnect:
