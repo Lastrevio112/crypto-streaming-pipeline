@@ -1,5 +1,5 @@
 # Real-time Cryptocurrency Charting Platform
-This is a near real time (2-5s of latency end to end) streaming pipeline using Kafka, Flink, Clickhouse, Grafana, Docker and Python/Javascript/Java/SQL. 
+This is a near real time (2-5s of latency end to end) streaming pipeline using **Kafka, Flink, Clickhouse, Grafana, Docker** and **Python/Javascript/Java/SQL**. 
 
 This project attempted to do something similar to what websites like Tradeview do, by streaming data from two websockets (Binance and MEXC) in real time using Kafka and creating trading-relevant aggregate measures on various candles using Flink - all of this being dumped in a Clickhouse sink at the end for fast OLAP processing. 
 
