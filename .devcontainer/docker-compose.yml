@@ -248,7 +248,6 @@ services:
       - ../certs:/etc/nginx/certs:ro        # my Let's Encrypt certs
       - ../src/frontend:/usr/share/nginx/html:ro # my static HTML/JS files
     depends_on:
-      - fastapi
       - grafana
     restart: unless-stopped
     networks:
