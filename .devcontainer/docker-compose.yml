@@ -239,7 +239,7 @@ services:
 
   nginx:
     container_name: crypto-nginx
-    image: nginx:alpine
+    image: nginx:latest
     platform: linux/arm64
     ports:
       - "80:80"
