@@ -1,5 +1,5 @@
 # Real-time Cryptocurrency Price Analysis
-This is an in-progress streaming pipeline using Kafka, Flink, FastAPI, Javascript, Clickhouse, Grafana and Docker. The goal is to create a real-time crypto charting platform.
+This is an in-progress streaming pipeline using Kafka, Flink, Clickhouse, Grafana, Docker and Python/Javascript/Java/SQL. The goal is to create a real-time crypto charting platform.
 
 # DATA FLOW UNTIL NOW
 
@@ -142,3 +142,17 @@ Extra business metrics (net_flow, average_trade_size, etc.) were added in the fi
 To avoid code duplication, I avoided copy-pasting the same code 9 times, and instead defined in Python a parent/base class called "AnalyticsView" and had two child classes inherit from it (AnalyticsTumbleView and AnalyticsSlidingView) - the base class is an abstract class with the query generator as an abstract method.
 
 The execute_all_sql_files.py script executes all our code: creates tables, materialized views, replaces view definition, etc.
+
+# FRONT END DOCUMENTATION
+
+I am not a web developer, so this might be the weakest part of the project in terms of code quality. Nevertheless, it's functional.
+
+I created four dashboards in Grafana and embedded each as an HTML IFrame object with the ?kiosk=true parameter in the URL to make it (mostly) read-only and restrict access to admin features. Since I did not embed the entire dashboard as an IFrame, and instead embedded each chart, the user doesn't have access to the variables I used in Grafana by default (coin and candle size selector) as well as the time range selection. Therefore, I had to create those buttons by scratch in HTML/CSS and use Javascript to create the logic that fires when you press them.
+
+The website also has a cool-looking sidebar that displays when you hover it, with hyperlinks to the other dashboards and my GitHub repository.
+
+# NGINX / REVERSE PROXYING
+
+Grafana has a refresh rate of 2s which means that every 2 seconds, Clickhouse gets queried. This worried me because if 1000 people enter my website at once, I don't want Clickhouse to get queried 1000 at once, I want it to get queried once on the server-side and for the results to be displayed to each client from the cache. The easiest way to achieve this was with nginx. Nginx can cache the actual pixels on the website so that users do not have direct access to make requests to our database. Its cache has a TTL of 2 seconds (the Grafana refresh rate) and its caching the body of the POST request (which is how Grafana makes requests to Clickhouse).
+
+I applied a global rate limit with a burst allowance of 60, as well as a max size of the cache (Both on disk and in RAM) in order to prevent any malicious actors 'trolling' me by making tens of thousands of requests per second. Even if they wouldn not poll my database with those requests, they would fill up the cache with garbage so other users would not be able to load the website - hence they will be blocked.
