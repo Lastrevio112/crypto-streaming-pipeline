@@ -1,11 +1,15 @@
-# Real-time Cryptocurrency Price Analysis
-This is an in-progress streaming pipeline using Kafka, Flink, Clickhouse, Grafana, Docker and Python/Javascript/Java/SQL. The goal is to create a real-time crypto charting platform.
+# Real-time Cryptocurrency Charting Platform
+This is a near real time (2-5s of latency end to end) streaming pipeline using Kafka, Flink, Clickhouse, Grafana, Docker and Python/Javascript/Java/SQL. 
+
+This project attempted to do something similar to what websites like Tradeview do, by streaming data from two websockets (Binance and MEXC) in real time using Kafka and creating trading-relevant aggregate measures on various candles using Flink - all of this being dumped in a Clickhouse sink at the end for fast OLAP processing. 
+
+Grafana connects to Clickhouse directly and is embedded in the HTML of the front-end built with vanilla Javascript. Full stack was containarized in Docker on a free Oracle virtual machine.
+
+**YOU CAN VIEW THE PROJECT HERE:** https://lastrevioprojects.org/index.html
 
 # DATA FLOW UNTIL NOW
 
-<img width="1569" height="938" alt="Data Flow" src="https://github.com/user-attachments/assets/a2eff656-5cf0-42b6-8416-fd6bda79795d" />
-
-
+<img width="1569" height="1078" alt="Data Flow" src="https://github.com/user-attachments/assets/4bf93b43-64e0-4d25-a9bc-d535737264a0" />
 
 # KAFKA PRODUCERS DOCUMENTATION
 
@@ -147,7 +151,7 @@ The execute_all_sql_files.py script executes all our code: creates tables, mater
 
 I am not a web developer, so this might be the weakest part of the project in terms of code quality. Nevertheless, it's functional.
 
-I created four dashboards in Grafana and embedded each as an HTML IFrame object with the ?kiosk=true parameter in the URL to make it (mostly) read-only and restrict access to admin features. Since I did not embed the entire dashboard as an IFrame, and instead embedded each chart, the user doesn't have access to the variables I used in Grafana by default (coin and candle size selector) as well as the time range selection. Therefore, I had to create those buttons by scratch in HTML/CSS and use Javascript to create the logic that fires when you press them.
+I created four dashboards in Grafana and embedded each chart as an HTML IFrame object with the ?kiosk=true parameter in the URL to make it (mostly) read-only and restrict access to admin features. Since I did not embed the entire dashboard as an IFrame, and instead embedded each chart, the user doesn't have access to the variables I used in Grafana by default (coin and candle size selector) as well as the time range selection. Therefore, I had to create those buttons by scratch in HTML/CSS and use Javascript to create the logic that fires when you press them.
 
 The website also has a cool-looking sidebar that displays when you hover it, with hyperlinks to the other dashboards and my GitHub repository.
 
