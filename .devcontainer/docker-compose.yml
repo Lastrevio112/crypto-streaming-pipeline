@@ -42,6 +42,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
       KAFKA_LOG_RETENTION_HOURS: 96 # Retain logs for 4 days
+      KAFKA_LOG_SEGMENT_MS: 86400000 # a segment can be active for at most 24 hours
       KAFKA_LOG_DIRS: /var/lib/kafka/data
     healthcheck:
       test: ["CMD", "/opt/kafka/bin/kafka-topics.sh", "--bootstrap-server", "localhost:9092", "--list"]
