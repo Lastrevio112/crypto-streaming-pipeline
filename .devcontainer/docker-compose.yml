@@ -1,3 +1,5 @@
+name: crypto-streaming-pipeline_devcontainer
+
 services:
   app:
     container_name: crypto-app
